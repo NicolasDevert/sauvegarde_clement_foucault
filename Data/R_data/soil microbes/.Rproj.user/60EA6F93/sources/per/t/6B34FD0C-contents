@@ -1,0 +1,396 @@
+#####################################
+### Script analyses soil microbes ###
+#####################################
+
+## Working directory ##
+
+setwd("/home/clfoucault/Dropbox/##Soil Microbes Internship/Data/R_data")  ## From work
+getwd()
+
+setwd("E:/Dropbox/Dropbox/##Soil Microbes Internship/Data/R_data") ## From home
+
+## Library ##
+install.packages("openssl")
+install.packages("tidyverse", dependencies = TRUE)
+install.packages("vegan")
+install.packages("labdsv")
+install.packages("devtools")
+devtools::install_github("gavinsimpson/ggvegan")
+install.packages("gridExtra")
+install.packages("ggpubr")
+install.packages("extrafont")
+install.packages("ggrepel")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("dada2", version = "3.10")
+BiocManager::install("phyloseq")
+BiocManager::install("Biostrings")
+theme_set(theme_bw())
+library(devtools)
+library(tidyverse)
+library(vegan)
+library(labdsv)
+library(gridExtra)
+library(ggpubr)
+library(extrafont)
+library(ggrepel)
+library(dada2); packageVersion("dada2")  
+
+font_import()
+y
+loadfonts()
+font_import(pattern = "Garamond.ttf")
+y
+
+mothur
+qiime2
+dada2
+
+## Packages I need to look at ##
+circlize  #https://jokergoo.github.io/circlize_book/book/
+
+## Data import ##
+
+soil_properties <- read.csv("soil_properties.csv",
+                            dec = ".",
+                            sep = ",",
+                            fileEncoding="UTF-8-BOM",
+                            row.names = 1,
+                            check.names = FALSE)
+colnames(soil_properties) <- c("light_treatment", "land_use", "ph", "sand_content", "silt_content", "clay_content", "cn_ratio", "soil")
+                            
+
+#algae
+a_class <- read.csv("algae/algae_class.csv",
+                   dec = ",",
+                   sep = ";",
+                   fileEncoding="UTF-8-BOM",
+                   row.names = 1)
+a_family <- read.csv("algae/algae_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_genus <- read.csv("algae/algae_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_order <- read.csv("algae/algae_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_phylum <- read.csv("algae/algae_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subclass <- read.csv("algae/algae_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_suborder <- read.csv("algae/algae_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subphylum <- read.csv("algae/algae_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+#bacteria
+b_class <- read.csv("bacteria/bacteria_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_family <- read.csv("bacteria/bacteria_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_genus <- read.csv("bacteria/bacteria_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_order <- read.csv("bacteria/bacteria_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_phylum <- read.csv("bacteria/bacteria_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+#fungi
+f_class <- read.csv("fungi/fungi_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_family <- read.csv("fungi/fungi_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_genus <- read.csv("fungi/fungi_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_order <- read.csv("fungi/fungi_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_phylum <- read.csv("fungi/fungi_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subclass <- read.csv("fungi/fungi_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subfamily <- read.csv("fungi/fungi_subfamily.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_suborder <- read.csv("fungi/fungi_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subphylum <- read.csv("fungi/fungi_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+
+##figures
+
+# Analyse canonique des correspondances
+
+## Sans ggplot ################################
+
+a_genus_cca
+a_genus_cca_plot <- plot(a_genus_cca) ## species are shown in red cross and samples as black circles.
+colvec<-c("brown", "yellow")
+a_genus_fit <- envfit(a_genus_cca~land_use + ph+cn_ratio+sand_content+clay_content, soil_properties, perm = 1000)
+plot(a_genus_cca, main="Algea Genus", type="n")
+with(soil_properties, points(a_genus_cca,display="sites",col=colvec[light_treatment], cex=1.2, pch=21, bg=colvec[light_treatment]))
+text(a_genus_cca, display="species", cex=0.5, col="gray0")
+with(soil_properties, legend("topright", legend=levels(light_treatment), col=colvec, pch=21, pt.bg=colvec))
+plot(a_genus_fit, cex=1.0, axis=TRUE)  
+
+?scores
+###### FUNCTION TO PRODUCE GRAPHICS ##
+## CCA
+graph_cca_algae <- function(data_algae) {
+  data_algae_log <- data_algae[-7,1:ncol(data_algae)] %>% decostand("log")
+  data_algae_cca <- cca(data_algae_log ~ land_use + sand_content + ph, data = soil_properties)
+  data_algae_scrs <- scores(data_algae_cca, display = c("sp","wa","lc","bp","cn"))
+  data_algae_sites <- data.frame(data_algae_scrs$sites, t(as.data.frame(strsplit(rownames(data_algae_scrs$sites),"_"))))
+  data_algae_sites <- cbind(data_algae_sites, soil_properties[,1])  # to add light treatment
+  colnames(data_algae_sites) <- c("x", "y", "soil", "light_treatment")
+  data_algae_sites <- data_algae_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                                soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                                soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                                soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  data_algae_plot <- ggplot()
+  data_algae_plot <- data_algae_plot + geom_point(data = data_algae_sites, aes(x, y, colour = light_treatment, shape = sample), size = 5) + 
+    scale_colour_manual(values = light_color) 
+  data_algae_biplots <- ordiArrowMul(data_algae_scrs$biplot)
+  data_algae_arrows <- data_algae_scrs$biplot * data_algae_biplots
+  colnames(data_algae_arrows) <- c("x", "y")
+  data_algae_arrows <- as.data.frame(data_algae_arrows)
+  data_algae_plot <- data_algae_plot + geom_segment(data_algae_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                                    arrow = arrow(length = unit(0.2, "cm")))
+  data_algae_plot <- data_algae_plot + geom_text_repel(as.data.frame(data_algae_arrows * 1.1), 
+                                                 mapping = aes(x, y, label = rownames(data_algae_arrows)))
+  data_algae_otus <- as.data.frame(data_algae_scrs$species)
+  colnames(data_algae_otus) <- c("x", "y")
+  data_algae_plot <- data_algae_plot + geom_jitter(data_algae_otus, mapping = aes(x, y), alpha = 1/5)
+  data_algae_plot <- data_algae_plot + theme_bw() + 
+    labs(x = "CCA1", colour = "Light Treatment", y = "CCA2", shape = "Soil Sample")
+}
+data_algae_plot<-data_algae_plot+geom_text(data=data_algae_species,aes(x,y,label=rownames(data_algae_species))) ## to add species text
+
+
+a1<-graph_cca_algae(a_class)
+a2<-graph_cca_algae(a_family)
+a3<-graph_cca_algae(a_genus)
+a4<-graph_cca_algae(a_order)
+a5<-graph_cca_algae(a_phylum)
+a6<-graph_cca_algae(a_subclass)
+a7<-graph_cca_algae(a_suborder)
+a8<-graph_cca_algae(a_subphylum)
+
+fonttable()
+
+ggarrange(a1,a2,a3,a4,a5,a6,a7,a8, common.legend = TRUE, 
+          legend = "right", 
+          labels = c("class", "family", "genus", "order", "phylum", "subclass", "suborder", "subphylum"))
+?ggarrange
+
+## NMDS
+nmds_a <- function(data_a) {
+  data_a = as.matrix(data_a)
+  data_a <- data_a[-7,1:ncol(data_a)]
+  nmds_a = metaMDS(data_a, distance = "bray")
+  data.scores = as.data.frame(scores(nmds_a), display = c("sites", "species"))
+  data.scores <- data.scores %>% mutate(Light = soil_properties$light_treatment,
+                                        Soil = soil_properties$soil)
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  ggnmds_a = ggplot(data.scores, aes(x = NMDS1, y = NMDS2)) + 
+    geom_point(size = 9, aes( shape = Soil, colour = Light))+ 
+    theme(axis.text.y = element_text(colour = "black", size = 12, face = "bold"), 
+          axis.text.x = element_text(colour = "black", face = "bold", size = 12), 
+          legend.text = element_text(size = 12, face ="bold", colour ="black"), 
+          legend.position = "right", axis.title.y = element_text(face = "bold", size = 14), 
+          axis.title.x = element_text(face = "bold", size = 14, colour = "black"), 
+          legend.title = element_text(size = 14, colour = "black", face = "bold"), 
+          panel.background = element_blank(), panel.border = element_rect(colour = "black", fill = NA, size = 1.2),
+          legend.key=element_blank()) + 
+    labs(x = "NMDS1", colour = "Light Treatment", y = "NMDS2", shape = "Soil Sample")  + 
+    scale_colour_manual(values = light_color)
+}
+
+
+nmds_f<-nmds_a(a_family)
+nmds_g<-nmds_a(a_genus)
+nmds_o<-nmds_a(a_order)
+nmds_p<-nmds_a(a_phylum)
+x11();ggarrange(nmds_f, nmds_g, nmds_o, nmds_p,
+          nrow = 2,
+          ncol = 2,
+          common.legend = TRUE, 
+          legend = "right", 
+          labels = c("family","genus","order","phylum"),
+          font.label = list(size = 12), position = "dodge",
+          hjust = -0.2)
+
+## ANOSIM 
+ano = anosim(a_order[-7,1:ncol(a_order)], soil_properties$light_treatment, distance = "bray", permutations = 9999)  ## Grouping by light is justified
+ano
+ano2 = anosim(a_order[-7,1:ncol(a_order)], soil_properties$soil, distance = "bray", permutations = 9999)
+ano2
+
+
+## DADA2 ##############################################################
+
+path <- "/home/clfoucault/Bureau/Fasta"
+
+# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
+fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_R2_001.fastq", full.names = TRUE))
+# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+# Visualizing quality profile of forward reads
+plotQualityProfile(fnFs[1:2])
+plotQualityProfile(fnRs[1:2]) # now for the reverse reads
+# Place filtered files in filtered/ subdirectory
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+# Apply standard filtering parameters
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,220),
+                     maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+                     compress=TRUE, multithread=TRUE,
+                     trimLeft = c(20,20)) # to remove primers
+head(out)
+# Learn the error rates
+errF <- learnErrors(filtFs, multithread=TRUE)
+errR <- learnErrors(filtRs, multithread=TRUE)
+plotErrors(errF, nominalQ=TRUE)
+# Apply the core sample inference algorithm to the filtered and trimmed sequence data
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+dadaFs[[1]]
+# Merge pair reads
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+# Inspect the merger data.frame from the first sample
+head(mergers[[1]])
+# Construct sequence table
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab)))
+# Remove chimeras
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+dim(seqtab.nochim)
+sum(seqtab.nochim)/sum(seqtab)
+# Track reads through the pipeline
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+head
+# Assign taxonomy [also see the alternative = DECIPHER]
+taxa <- assignTaxonomy(seqtab.nochim, "~/tax/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+# Inspect the taxonomic assignment
+taxa.print <- taxa # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+# Evaluate accuracy of taxonomic assignment
+unqs.mock <- seqtab.nochim["Mock",]
+unqs.mock <- sort(unqs.mock[unqs.mock>0], decreasing=TRUE) # Drop ASVs absent in the Mock
+cat("DADA2 inferred", length(unqs.mock), "sample sequences present in the Mock community.\n")
+mock.ref <- getSequences(file.path(path, "HMP_MOCK.v35.fasta"))
+match.ref <- sum(sapply(names(unqs.mock), function(x) any(grepl(x, mock.ref))))
+cat("Of those,", sum(match.ref), "were exact matches to the expected reference sequences.\n")
+
+
+## PHYLOSEQ ################################
+samples.out <- rownames(seqtab.nochim)
+subject <- sapply(strsplit(samples.out, "D"), `[`, 1)
+gender <- substr(subject,1,1)
+subject <- substr(subject,2,999)
+day <- as.integer(sapply(strsplit(samples.out, "D"), `[`, 2))
+samdf <- data.frame(Subject=subject, Gender=gender, Day=day)
+samdf$When <- "Early"
+samdf$When[samdf$Day>100] <- "Late"
+rownames(samdf) <- samples.out
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+ps <- prune_samples(sample_names(ps) != "Mock", ps) # Remove mock sample
+dna <- Biostrings::DNAStringSet(taxa_names(ps))
+names(dna) <- taxa_names(ps)
+ps <- merge_phyloseq(ps, dna)
+taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
+ps
+# We are now ready to use phyloseq ! 
+# Visualize alpha-diversity
+plot_richness(ps, x="Day", measures=c("Shannon", "Simpson"), color="When")
+# Transform data to proportions as appropriate for Bray-Curtis distances
+ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+ord.nmds.bray <- ordinate(ps.prop, method="NMDS", distance="bray")
+plot_ordination(ps.prop, ord.nmds.bray, color="When", title="Bray NMDS")
+# Barplot
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, x="Day", fill="Family") + facet_wrap(~When, scales="free_x")
+
+
+
+
+
+

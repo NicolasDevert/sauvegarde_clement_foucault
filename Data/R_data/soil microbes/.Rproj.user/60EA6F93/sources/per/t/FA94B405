@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580979884553.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "FA94B405",
+    "lastKnownWriteTime" : 1580832836,
+    "last_content_update" : 1580979884553,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "id" : "d3818ced590d4e6c97f21bed8cd753bc",
+        "name" : "a_genus_cca",
+        "title" : "a_genus_cca"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "object_explorer"
+}

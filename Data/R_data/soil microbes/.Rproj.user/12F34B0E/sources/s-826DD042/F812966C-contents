@@ -1,0 +1,88 @@
+################################# TD MARES #################################
+
+## Chargement packages ## 
+install.packages("vegan") 
+install.packages("FactoMineR")
+install.packages("ade4")
+install.packages("labdsv")
+library(vegan) ; library(FactoMineR) ; library(ade4)
+library(labdsv)
+
+data("kcponds")
+kcponds$tab->ponds
+kcponds$xy->coord
+ponds<-ponds[,-c(1,2,11:15)] #on supprime les colonnes pas int?ressantes
+
+
+## Diff?rentes fonctions ##
+# PCA() = r?alise une Principal Component Analysis
+# metaMDS() = Nonmetric Multidimensional Scaling
+# CA() = Correspondence Analysis
+# s.class() = "diagramme de fragmentation"
+
+# M?thode facile 
+
+par(mfrow=c(1,2)) #pour afficher plot et MDS en m?me temps
+plot(coord, xlab="Coordonn?es X", ylab="Coordonn?es Y", main="Positions des 33 stations", col="blue", cex=3) # on plot les coordonn?es des mares
+lab=row.names(coord) # on stocke le num?ro des mares dans un vecteur
+text(coord$x, coord$y, labels=lab, cex=0.7) # ?a met le num?ro des mares dans chaque mare
+
+
+# M?thode absolument obscure :)
+
+mds<-metaMDS(dist(coord, method="euclidian"), k=2, trymax=20, autotransform = FALSE) #dist = construction d'une matrice de distance
+mds$stress # Le stress = 0 car on fait une MDS de coordonn?es en 2 dimensions = rien de plus simple
+
+plot(mds, type="t") #type="t" pour avoir du texte au lieu de points sur le graph
+
+
+
+# On fait une PCA avec les carac physicochimiques des mares
+
+?PCA
+sponds<-scale(ponds) # Centrer r?duire les donn?es
+acponds<-PCA(sponds,            
+             ncp=ncol(ponds),  # ncp = nombre de dimensions dans l'analyse
+             scale.unit=TRUE,  # scale.unit = les donn?es sont-elles centr?es r?duites ?
+             graph=FALSE)      # si on veut un graph ou non
+ 
+                                                        
+acponds$eig # selon le crit?re de Kaiser, il faut que eigenvalue >1 : on garde les axes 1, 2 et (3)
+# Ces axes vont expliquer plus de 50% de la variance totale
+
+par(mfrow=c(1,1))
+barplot(acponds$eig[,1]) #on selectionne les eigenvalues pour le plot
+
+par(mfrow=c(1,2))
+acponds<-PCA(sponds,            
+             ncp=ncol(ponds),  # ncp = nombre de dimensions dans l'analyse
+             scale.unit=TRUE,  # scale.unit = les donn?es sont-elles centr?es r?duites ?
+             graph=TRUE,       # si on veut un graph ou non
+             axes=c(1,2))      # on choisit 1 et 2 puisqu'elles ont les egenvalues les + ?lev?es
+
+
+
+# Analyse de groupement sur les coordonn?es g?ographiques
+?hclust
+?dist
+dist<-dist(coord, method="euclidean")
+clust<-hclust(dist, method="complete")
+par(mfrow=c(1,1))
+plot(clust, hang=-50)
+groupe<-cutree(clust,h=200)
+geogroupe<-as.factor(groupe)
+
+# Couplage avec s.class
+par(mfrow=c(1,2))
+s.class(acponds$ind$coord, fac=geogroupe, xax=1, yax=2, col=c(1,6))
+s.class(kcponds$xy, fac=geogroupe, xax=1, yax=2, col=c(1,6))
+
+
+## Correspondance Analysis sur herbiers
+
+herbier<-read.csv("herbier2013.csv", sep=";",dec=",", header=T, row.names=1)
+herbierlog<-decostand(herbier, method="log", logbase=10)
+herbierlog<-t(herbierlog)
+par(mfrow=c(1,1))
+ca<-CA(herbierlog, ncp=ncol(herbier))
+

@@ -1,0 +1,30 @@
+Taxonomy_highest	Bacillariophyta	Anthocerotophyta	Rhodophyta	Bacillariophyta	Bryophyta	Bacillariophyta	Bryophyta	Marchantiophyta	Marchantiophyta	Bryophyta	Marchantiophyta	Bacillariophyta	Marchantiophyta	Marchantiophyta	Bacillariophyta	Anthocerotophyta	Bacillariophyta	Bacillariophyta	Marchantiophyta	Anthocerotophyta	Marchantiophyta	Bryophyta	Bacillariophyta	Bryophyta	Bacillariophyta	Unknown	Unclassified	Environmental	
+Taxonomy_intermediate					Bryophytina		Bryophytina			Bryophytina												Bryophytina		Bryophytina	
+Taxonomy_intermediate	Mediophyceae	Anthocerotopsida	Florideophyceae	Bacillariophyceae	Bryopsida	Coscinodiscophyceae	Bryopsida	Marchantiopsida	Haplomitriopsida	Bryopsida	Marchantiopsida	Coscinodiscophyceae	Haplomitriopsida	Jungermanniopsida	Coscinodiscophyceae	Anthocerotopsida	Coscinodiscophyceae	Bacillariophyceae	Jungermanniopsida	Anthocerotopsida	Jungermanniopsida	Bryopsida	Fragilariophyceae	Bryopsida	Mediophyceae
+Taxonomy_subclass	Lithodesmiophycidae	Notothylidae	Corallinophycidae	Bacillariophycidae	Dicranidae	Chaetocerotophycidae	Bryidae	Marchantiidae	Treubiidae	Buxbaumiidae	Blasiidae	Coscinodiscophycidae	Haplomitriidae	Metzgeriidae	Thalassiosirophycidae	Dendrocerotidae	Rhizosoleniophycidae	Eunotiophycidae	Pelliidae	Anthocerotidae	Jungermanniidae	Diphysciidae	Fragilariophycidae	Funariidae	Biddulphiophycidae	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	385	38	0	173	0	0	0	0	0	0	1	2	0	0	2780	0	0	0	0	2	27	1	6318	273	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	399	60	0	337	0	0	0	0	0	0	0	0	0	0	2160	0	0	0	0	1	0	2	6766	275	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	448	20	0	259	0	0	0	0	0	0	0	6	0	0	2634	0	0	0	0	2	0	0	6403	228	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	84	2	0	658	0	0	0	0	0	0	0	0	0	0	467	0	0	0	0	0	0	0	8699	90	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	71	5	0	165	0	0	0	0	0	0	0	2	0	0	357	0	0	0	0	1	1	1	9344	53	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	43	3	0	192	0	0	0	0	0	0	0	1	0	0	309	0	0	0	0	1	0	0	9405	46	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_ETL1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	5	0	271	249	0	218	4	0	0	0	0	1	0	35	5	0	679	1	10	0	118	5	2	15	7690	692	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	9	13	0	950	0	0	0	0	0	0	0	0	0	0	13	0	11	2	0	0	19	0	5705	3278	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	1	0	10	0	136	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	6140	3711	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	1	0	113	0	0	0	0	0	0	0	0	0	0	2	0	13	0	0	0	31	0	7608	2232	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	11	0	3	0	0	0	0	0	0	0	0	0	0	5	0	0	0	1	0	0	0	9652	328	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	3	4	0	2	0	0	0	0	0	0	0	1	0	0	1	0	0	0	0	0	0	0	9727	262	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	7	7	0	2	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	9810	173	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	1	690	98	0	555	7	0	0	0	0	0	0	34	0	0	835	0	0	0	0	2	0	15	7480	283	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	1189	22	0	33	0	0	0	0	0	0	0	37	0	0	451	0	0	0	0	3	0	11	7905	349	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	789	303	1	974	6	0	0	0	0	0	0	38	0	0	760	0	0	0	0	8	0	11	6787	323	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	681	72	0	65	1	0	0	0	0	0	0	32	0	0	349	0	3	0	0	3	0	3	7716	1075	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	666	215	0	620	0	0	0	0	0	0	0	23	0	0	847	0	0	0	0	8	0	12	7380	229	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	1022	29	0	25	0	0	0	0	0	0	0	54	0	1	368	0	0	0	0	11	0	9	8011	470	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	388	646	0	865	0	0	0	0	0	0	0	0	0	0	313	0	1	0	0	2	0	11	7264	510	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	433	754	0	922	0	0	0	0	0	0	0	5	0	0	366	0	0	0	0	3	1	5	7137	374	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	379	895	0	946	0	0	0	0	0	0	0	5	0	0	324	0	1	0	0	2	1	11	7060	376	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	99	1038	0	2297	0	0	0	0	0	0	0	3	0	0	87	0	0	0	0	1	1	0	6259	215	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	105	1336	0	2539	0	0	0	0	0	0	0	2	0	0	65	0	0	0	0	3	1	1	5735	213	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	125	1127	0	2586	0	0	0	0	0	0	0	2	0	0	105	0	0	0	0	2	0	0	5831	222	0	
+

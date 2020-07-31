@@ -1,0 +1,1960 @@
+#####################################
+### Script analyses soil microbes ###
+#####################################
+
+## Working directory ##
+
+setwd("/home/clfoucault/Dropbox/##Soil Microbes Internship/Data/R_data")  ## From work
+getwd()
+
+setwd("E:/Dropbox/Dropbox/##Soil Microbes Internship/Data/R_data") ## From home
+#setwd("C:/Users/nfanin/Dropbox/Soil Microbes Internship/Data/R_data/soil microbes")
+
+
+
+
+## Library ##
+install.packages("openssl")
+install.packages("tidyverse", dependencies = TRUE)
+install.packages("vegan")
+install.packages("labdsv")
+install.packages("devtools")
+devtools::install_github("gavinsimpson/ggvegan")
+install.packages("gridExtra")
+install.packages("ggpubr")
+install.packages("extrafont")
+install.packages("ggrepel")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("dada2", version = "3.10")
+BiocManager::install("phyloseq")
+BiocManager::install("Biostrings")
+install.packages("grid")
+install.packages("esquisse")
+theme_set(theme_bw())
+install.packages("dendextend")
+install.packages("reshape2")
+install.packages("viridis")
+install.packages("gdtools")
+install.packages("hrbrthemes", repos = "https://cinc.rud.is")
+install.packages("wesanderson")
+install.packages("RColorBrewer")
+install.packages("xlsx")
+install.packages("gllvm")
+install.packages("mvabund")
+install.packages("broom")
+install.packages("GGally")
+install.packages("corrplot")
+install.packages("gclus")
+install.packages("colortools")
+
+library(devtools)
+library(plyr)
+library(tidyverse)
+library(vegan)
+library(labdsv)
+library(gridExtra)
+library(ggpubr)
+library(extrafont)
+library(ggrepel)
+library(dada2); packageVersion("dada2") 
+`%!in%` <- function(a,b) ! a %in% b
+library(grid)
+library(phyloseq)
+library(esquisse)
+library(dendextend)
+library(reshape2)
+library(viridis)
+library(hrbrthemes)
+hrbrthemes::import_roboto_condensed()
+library(wesanderson)
+library(RColorBrewer)
+library(rmarkdown)
+library(gllvm)
+library(broom)
+library(GGally)
+library(corrplot); library(gclus)
+library(colortools)
+
+font_import()
+y
+loadfonts()
+font_import(pattern = "Garamond.ttf")
+y
+
+mothur
+qiime2
+dada2
+
+## Packages I need to look at ##
+circlize  #https://jokergoo.github.io/circlize_book/book/
+
+## Data import ##
+
+soil_properties <- read.csv("soil_properties.csv",
+                            dec = ".",
+                            sep = ";",
+                            fileEncoding="UTF-8-BOM",
+                            row.names = 1,
+                            check.names = FALSE)
+soil_properties_f <- soil_properties[-18,]
+
+sp_row <- read.csv("soil_properties.csv",
+                            dec = ".",
+                            sep = ";",
+                            fileEncoding="UTF-8-BOM",
+                            check.names = FALSE)
+
+
+
+otu_gas <- read.csv("otu_gas.csv",
+                    sep = "\t",
+                    fileEncoding = "UTF-8-BOM")
+otu_gas_b_genus <- otu_gas %>% filter(group == "bacteria" & taxonomic_level == "genus") %>% 
+  select(phyla, cos)
+
+
+geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5) ## pour ajouter labels espèces
+  
+  
+#algae
+a_class <- read.csv("algae/algae_class.csv",
+                   dec = ",",
+                   sep = ";",
+                   fileEncoding="UTF-8-BOM",
+                   row.names = 1)
+a_family <- read.csv("algae/algae_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_genus <- read.csv("algae/algae_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_order <- read.csv("algae/algae_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_phylum <- read.csv("algae/algae_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subclass <- read.csv("algae/algae_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_suborder <- read.csv("algae/algae_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subphylum <- read.csv("algae/algae_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+#bacteria
+b_class <- read.csv("bacteria/bacteria_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_family <- read.csv("bacteria/bacteria_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_genus <- read.csv("bacteria/bacteria_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_order <- read.csv("bacteria/bacteria_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_phylum <- read.csv("bacteria/bacteria_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+#fungi
+f_class <- read.csv("fungi/fungi_class.csv",
+                    dec = ",",
+                    sep = "\t",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_family <- read.csv("fungi/fungi_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_genus <- read.csv("fungi/fungi_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_order <- read.csv("fungi/fungi_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_phylum <- read.csv("fungi/fungi_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subclass <- read.csv("fungi/fungi_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subfamily <- read.csv("fungi/fungi_subfamily.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_suborder <- read.csv("fungi/fungi_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subphylum <- read.csv("fungi/fungi_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+
+
+## To manipulate Joana excel file
+
+data_mean <- read.csv("Algae_calibrated_data_final_tab.csv", 
+                      dec = ",",
+                      sep = ";",
+                      fileEncoding="UTF-8-BOM")
+
+data_mean2 <- data_mean %>% filter((Algae_growth == "y" & DarkLight == "Light") | (Algae_growth == "n" & DarkLight == "Dark")) %>% 
+  select(Pot_ID, OCS_flux, CO2_flux_aero, Algae_growth, DarkLight) %>%
+  group_by(Pot_ID, Algae_growth, DarkLight) %>% summarize(mean_ocs_flux = mean(OCS_flux),
+                                 mean_co2_flux = mean(CO2_flux_aero))
+                                 
+
+write_excel_csv(data_mean2, "result_data.csv")
+
+
+
+
+## JOANA PLOTS
+
+jplot <- data_mean %>% select(Sample, Algae_growth, DarkLight, OCS_flux, CO2_flux_aero) %>% 
+  group_by(Sample, Algae_growth, DarkLight) %>% summarize(ocs = mean(OCS_flux),
+                                                          co2 = mean(CO2_flux_aero)) %>% 
+  mutate(treatment = case_when(Algae_growth == "y" & DarkLight == "Light" ~ "LCLP",
+                               Algae_growth == "y" & DarkLight == "Dark" ~ "LCDP",
+                               Algae_growth == "n" & DarkLight == "Light" ~ "DCLP",
+                               Algae_growth == "n" & DarkLight == "Dark" ~ "DCDP"))
+
+col_soil <- c("LCLP" = "darkolivegreen1",
+              "LCDP" = "darkolivegreen3",
+              "DCLP" = "tan3",
+              "DCDP" = "tan4")
+jplot$Sample <- factor(jplot$Sample, levels = c("LB", "LCGE", "DBZ", "TL2"))
+plot <- ggplot(jplot, mapping = aes(x = Sample, y = ocs, fill = treatment)) +
+  geom_col(position = "dodge", col = "black") +
+  theme_ipsum(axis_title_size = 18,
+              plot_title_size = 25,
+              plot_title_face = "bold",
+              plot_title_margin = 0.5,
+              base_size = 18) +
+  scale_fill_manual(values = col_soil) +
+  labs(title = "COS net fluxes across light treatments",
+       fill = "Light treatment",
+       y = "COS net flux",
+       x = "Soil")
+print(plot)
+
+plot <- ggplot(jplot, mapping = aes(x = Sample, y = co2, fill = treatment)) +
+  geom_col(position = "dodge", col = "black") +
+  theme_ipsum(axis_title_size = 18,
+              plot_title_size = 25,
+              plot_title_face = "bold",
+              plot_title_margin = 0.5,
+              base_size = 18) +
+  scale_fill_manual(values = col_soil) +
+  labs(title = "CO2 net fluxes across light treatments",
+       fill = "Light treatment",
+       y = "COS net flux",
+       x = "Soil")
+print(plot)
+
+
+ ##figures
+
+# Analyse canonique des correspondances
+
+###### FUNCTION TO PRODUCE GRAPHICS ##
+## CCA
+graph_cca <- function(data, data_sp, data_gas) {
+  data_log <- data %>% decostand("log")
+  data_cca <- cca(data_log ~ land_use + sand_content + ph + silt_content + cn_ratio + light_treatment + ocs_flux + co2_flux, data = data_sp)
+  data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+  data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+  data_sites <- cbind(data_sites, data_sp[,1])  # to add light treatment
+  colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+  data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                          soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                          soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                          soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  data_plot <- ggplot()
+  data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+  data_biplots <- ordiArrowMul(data_scrs$biplot)
+  data_arrows <- data_scrs$biplot * data_biplots
+  colnames(data_arrows) <- c("x", "y")
+  data_arrows <- as.data.frame(data_arrows)
+  data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                        arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+  data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                           mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+  data_otus <- as.data.frame(data_scrs$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(data))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("phyla", "x", "y", "sum")
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+  cos_color <- c("uptake" = "green", "emission" = "red")
+  data_plot <- data_plot + theme_ipsum_ps() + 
+    labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+    scale_color_manual(values = cos_color)
+  data_otus_cos <- merge(data_otus, data_gas, by = "phyla", all.x= F, all.y= F)
+  data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+  data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+  data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                               legend.text = element_text(size = 15),
+                               legend.title = element_text(size = 20)) +
+    geom_text_repel(data_otus, mapping = aes(x,y, label=data_otus$phyla), family = "Garamond", max.iter = 10000, size = 5)
+}
+loadfonts()
+
+
+a=graph_cca(a_genus)
+x11();print(g1)
+
+
+
+graph_cca_gas <- function(data, data_sp, data_gas) {
+  data_log <- data %>% decostand("log")
+  data_cca <- cca(data_log ~ ocs_flux + co2_flux, data = data_sp)
+  data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+  data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+  data_sites <- cbind(data_sites, data_sp[,1])  # to add light treatment
+  colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+  data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                          soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                          soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                          soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  data_plot <- ggplot()
+  data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+  data_biplots <- ordiArrowMul(data_scrs$biplot)
+  data_arrows <- data_scrs$biplot * data_biplots
+  colnames(data_arrows) <- c("x", "y")
+  data_arrows <- as.data.frame(data_arrows)
+  data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                        arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+  data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                           mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+  data_otus <- as.data.frame(data_scrs$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(data))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("phyla", "x", "y", "sum")
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+  cos_color <- c("uptake" = "green", "emission" = "red")
+  data_plot <- data_plot + theme_bw() + 
+    labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+    scale_color_manual(values = cos_color)
+  data_otus_cos <- merge(data_otus, data_gas, by = "phyla", all.x= F, all.y= F)
+  data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+  data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+  data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                               legend.text = element_text(size = 15),
+                               legend.title = element_text(size = 20)) +
+    geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5)
+}
+
+graph_cca_gas_pos <- function(data, data_sp, data_gas, x.value, y.value, x.value2, y.value2) {
+  data_log <- data %>% decostand("log")
+  data_cca <- cca(data_log ~ ocs_flux + co2_flux, data = data_sp)
+  data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+  data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+  data_sites <- cbind(data_sites, data_sp[,1])  # to add light treatment
+  colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+  data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                          soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                          soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                          soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  data_plot <- ggplot()
+  data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+  data_biplots <- ordiArrowMul(data_scrs$biplot)
+  data_arrows <- data_scrs$biplot * data_biplots
+  colnames(data_arrows) <- c("x", "y")
+  data_arrows <- as.data.frame(data_arrows)
+  data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                        arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+  data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                           mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+  data_otus <- as.data.frame(data_scrs$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(data))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("phyla", "x", "y", "sum")
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+  cos_color <- c("uptake" = "green", "emission" = "red")
+  data_plot <- data_plot + theme_bw() + 
+    labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+    scale_color_manual(values = cos_color)
+  data_otus_cos <- merge(data_otus, data_gas, by = "phyla", all.x= F, all.y= F)
+  data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+  data_otus_pos <- data_otus %>% filter(x < x.value, y < y.value)
+  data_plot <- data_plot + geom_text_repel(data_otus_pos, mapping = aes(x,y, label=data_otus_pos$phyla), 
+                                           family = "Garamond", max.iter = 10000, size = 5)
+  data_otus_pos2 <- data_otus %>% filter(x > x.value2, y > y.value2)
+  data_plot <- data_plot + geom_text_repel(data_otus_pos2, mapping = aes(x,y, label=data_otus_pos2$phyla), 
+                                           family = "Garamond", max.iter = 10000, size = 5)
+  data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+  data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                               legend.text = element_text(size = 15),
+                               legend.title = element_text(size = 20)) +
+    geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5)
+}
+
+
+
+ggarrange(gga_genus, ggf_genus, ggb_genus, ggb_phylum, common.legend = TRUE, 
+          legend = "right", 
+          labels = c("Algae genus", "Fungi genus", "Bacteria genus", "Bacteria phylum"))
+
+
+ggsave("algalCCA.png", plot = last_plot(), device = NULL, path = NULL,
+                                scale = 1, width = NA, height = NA, units = "cm",
+                                dpi = 300)
+
+ggarrange(a1,a2,a3,a4,a5,a6,a7,a8, common.legend = TRUE, 
+          legend = "right", 
+          labels = c("class", "family", "genus", "order", "phylum", "subclass", "suborder", "subphylum"))
+
+## NMDS
+nmds_a <- function(data_a, data_sp) {
+  data_a = as.matrix(data_a)
+  nmds_a = metaMDS(data_a, distance = "bray")
+  data_sites <- data.frame(nmds_a$points, t(as.data.frame(strsplit(rownames(nmds_a$points),"_"))))
+  data_sites <- data_sites %>% mutate(Light = data_sp$light_treatment,
+                                      Soil = data_sp$soil)
+  colnames(data_sites) = c("NMDS1", "NMDS2", "sample", "light_treatment", "soil")
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  ggnmds_a = ggplot() + 
+    geom_point(data_sites, mapping = aes(x = NMDS1, y = NMDS2, shape = soil, fill = light_treatment), size = 5)+
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))
+  data_otus <- as.data.frame(nmds_a$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(data_a))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("otu", "x", "y", "sum")
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(otu %!in% c("Unclassified","Unknown")) 
+  ggnmds_a <- ggnmds_a + geom_point(data_otus, mapping = aes(x, y, col = relative_abun), alpha = 1/3)
+  ggnmds_a <- ggnmds_a + theme(axis.text.y = element_text(colour = "black", size = 12, face = "bold"), 
+                               axis.text.x = element_text(colour = "black", face = "bold", size = 12), 
+                               legend.text = element_text(size = 12, face ="bold", colour ="black"), 
+                               legend.position = "right", axis.title.y = element_text(face = "bold", size = 14), 
+                               axis.title.x = element_text(face = "bold", size = 14, colour = "black"), 
+                               legend.title = element_text(size = 14, colour = "black", face = "bold"), 
+                               panel.background = element_blank(), panel.border = element_rect(colour = "black", fill = NA, size = 1.2),
+                               legend.key=element_blank()) + 
+    labs(x = "NMDS1", fill = "Light Treatment", y = "NMDS2", shape = "Soil Sample", size = "OTU relative abundance")  
+  ggnmds_a <- ggnmds_a + geom_point(data_otus, mapping = aes(x, y, size = relative_abun, col = relative_abun))
+  ggnmds_a <-ggnmds_a + geom_text_repel(data_otus,mapping = aes(x,y, label=data_otus$otu), family = "Garamond",
+                                        label.padding = 0.4, force = 5, max.iter = 10000, size = 5) +
+    theme(text=element_text(family="Garamond"),
+          legend.text = element_text(size = 15),
+          legend.title = element_text(size = 20))
+  stress <- nmds_a$stress
+  expl <- grobTree(textGrob("Stress :", x=0.02,  y=0.95, hjust=0,
+                            gp=gpar(col="black", fontsize=13, fontface="italic", family = "Garamond")))
+  grob <- grobTree(textGrob(stress, x=0.05,  y=0.95, hjust=0,
+                            gp=gpar(col="black", fontsize=13, fontface="italic", family = "Garamond")))
+  ggnmds_a <-ggnmds_a + annotation_custom(grob)
+  ggnmds_a <-ggnmds_a + annotation_custom(expl)
+}
+
+
+nmds_b_genus <- nmds_a(a_phylum)
+x11();print(nmds_b_genus)
+ggsave("a_genus_NMDS.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+nmds_f_genus<-nmds_f(f_genus)
+x11(); print(nmds_f_genus)
+nmds_g<-nmds_a(a_genus)
+nmds_o<-nmds_a(b_genus)
+nmds_p<-nmds_a(b_phylum)
+x11();ggarrange(nmds_f, nmds_g, nmds_o, nmds_p,
+          nrow = 2,
+          ncol = 2,
+          common.legend = TRUE, 
+          legend = "right", 
+          labels = c("family","genus","order","phylum"),
+          font.label = list(size = 12), position = "dodge",
+          hjust = -0.2)
+
+ 
+
+## PLOTS
+
+## What is the difference between ANOSIM and PERMANOVA ?
+#   ANOSIM tests whether distances between groups are greater than within groups. PERMANOVA tests whether distance differ between groups.
+## SILT CONTENT AND CN RATIO ARE REDONDANT FACTORS
+
+
+## What is an NMDS ?
+#   Non-metric multidimensional scaling (NMDS) is an indirect gradient analysis approach which produces an ordination based on a distance or dissimilarity matrix.
+#   The goal of NMDS is to represent the original position of communities in multidimensional space as accurately as possible using a reduced number of dimensions 
+#   that can be easily plotted and visualized (and to spare your thinker).
+
+
+## What is a CCA ? 
+#   CCA is a multivariate constrained ordination technique that extracts major gradients among combinations of explanatory variables in a dataset.
+
+
+
+# Algae class
+cca_a_class <- graph_cca(a_class)
+x11(); print(cca_a_class)
+cca_a_class_gas <- graph_cca_gas(a_class)
+print(cca_a_class_gas)
+ggsave("plots/a_class_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+anosim(a_class, soil_properties$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is justified
+anosim(a_class, soil_properties$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(a_class ~ light_treatment * soil, data = soil_properties) ## Soil and light both have significant effects on communities
+adonis2(a_class ~ light_treatment * land_use * sand_content * ph, data = soil_properties) ## All variables have significant effects on communities
+nmds_a_class <- nmds_a(a_class, soil_properties)
+x11(); print(nmds_a_class)
+
+
+a_class_dend <- a_class %>% dist() %>% hclust(method = "average") %>% as.dendrogram()   
+par(mar = c(7, 3, 1, 1)) ; plot(a_class_dend)
+a_class_dend %>% 
+  # Custom branches
+  set("branches_col", "grey") %>% set("branches_lwd", 3) %>%
+  # Custom labels
+  set("labels_col", "orange") %>% set("labels_cex", 0.8) %>%
+  plot()
+par(mar=c(1,1,1,7))
+a_class_dend %>%
+  set("labels_col", value = c("skyblue", "orange", "grey", "gold", "red", "brown"), k=6) %>%
+  set("branches_k_color", value = c("skyblue", "orange", "grey", "gold", "red", "brown"), k = 6) %>%
+  plot(horiz=TRUE, axes=FALSE)
+abline(v = 350, lty = 2)
+
+a_class_bar <- read.csv("algae/algae_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM")
+a_class_bar <- melt(a_class_bar, id.vars = "soil", variable.name = "Phyla")
+a_class_bar <- a_class_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+a_class_bar <- a_class_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- a_class_bar %>% sapply(function(Phyla) length(unique(Phyla))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(Phyla) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+a_class_bar %>% ggplot(aes(fill=Phyla, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(title= "Algal diversity in soils at class taxonomic level", 
+       subtitle = "Only algal class >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Algal class") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors)
+
+
+nb.cols <- 15
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+
+a_class %>% dist() %>% as.matrix() %>% heatmap(Colv = NA, Rowv = NA) ## Dark LB soils are very different from the rest
+
+a_class_bar <- read.csv("algae/algae_class.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+a_class_bar %>% select(soil, Unknown) %>% cbind(soil_properties$light_treatment) %>% 
+  ggplot(aes(x=soil, y=Unknown, fill = soil_properties$light_treatment)) + geom_col() +
+  labs(x = "Soil Sample", y = "Number of unknown sequences", fill = "Light treatment") +    ## Lots of unknown sequences in the dark
+  scale_fill_manual(values = c("orange4","darkgoldenrod1")) +
+  theme_ipsum_ps() + scale_fill_ipsum()
+
+# Algae genus
+
+cca_a_genus <- graph_cca(a_genus, soil_properties, a_gas)
+print(cca_a_genus)
+ggsave("plots/a_genus_cca.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+a_gas <- otu_gas %>% filter(group == "algae" & taxonomic_level == "genus") %>% 
+  select(phyla, cos)
+data_plot <- graph_cca_gas_pos(a_genus, soil_properties, a_gas, -0.5, -0.5, 1.5, -2)
+x11() ; print(data_plot)
+ggsave("plots/a_genus_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+anosim(a_genus, soil_properties$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is justified (p = 0.02)
+anosim(a_genus, soil_properties$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+a_genus[13:18,] %>% anosim(soil_properties[13:18,]$light, distance = "bray", permutations = 9999) ## Grouping LG by light is not justified
+adonis2(a_genus ~ light_treatment * soil, data = soil_properties) ## Soil and light both have significant effects on communities
+adonis2(a_genus ~ light_treatment * land_use * sand_content * ph, data = soil_properties) ## All variables have significant effects on communities
+nmds_a_genus <- nmds_a(a_genus)
+x11(); print(nmds_a_genus)
+
+
+
+
+a_genus_dend <- a_genus %>% dist() %>% hclust() %>% as.dendrogram()
+par(mar = c(7, 3, 1, 1)) ; plot(a_genus_dend)
+
+
+
+
+
+TL_ga <- a_genus_bar %>% filter(soil %in% c("TL4", "TL5", "TL6"))
+
+a_genus_bar <- read.csv("algae/algae_genus.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+a_genus_bar <- melt(a_genus_bar, id.vars = "soil", variable.name = "Phyla")
+a_genus_bar <- a_genus_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+a_genus_bar <- a_genus_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance) * 100)
+nb.cols <- a_genus_bar %>% sapply(function(Phyla) length(unique(Phyla))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(Phyla) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+a_genus_bar %>% ggplot(aes(fill=Phyla, y=r_abundance2, x=soil)) + 
+  geom_bar(position="stack", stat="identity") +              
+  labs(title= "Algal diversity in soils at genus taxonomic level", 
+       subtitle = "Only algal genus >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Algal genus") +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) +
+  coord_cartesian(ylim = c(0, 100))
+
+
+
+
+dodge <- position_dodge(width=0.9)
+ag_lightplot <- soil_properties %>% 
+  group_by(soil, light_treatment) %>% 
+  summarize(cos = mean(ocs_flux),
+            se = sd(ocs_flux / sqrt(length(ocs_flux)))) %>% 
+  ggplot(aes(x = soil, y = cos, fill = light_treatment)) + 
+           geom_col(position = "dodge", col = "black") +
+  geom_errorbar(aes(ymin = cos - se, ymax = cos + se), 
+                position = dodge,
+                width = 0.2) +
+  theme_ipsum(axis_title_size = 18,
+                 plot_title_size = 25,
+                 plot_title_face = "bold",
+                 plot_title_margin = 0.5,
+              base_size = 18) +
+  scale_fill_manual(values = wes_palette("Chevalier1", n = 2)) +
+  labs(title = "COS net flux between soils and light treatment",
+       fill = "Light treatment",
+       y = "COS net flux",
+       x = "Soil")
+print(ag_lightplot)
+ggsave("plots/cos_soil_light.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+ag_co2plot <- soil_properties %>% 
+  group_by(soil, light_treatment) %>% 
+  summarize(co2 = mean(co2_flux),
+            se = sd(co2_flux / sqrt(length(co2_flux)))) %>% 
+  ggplot(aes(x = soil, y = co2, fill = light_treatment)) + 
+  geom_col(position = "dodge", col = "black") +
+  geom_errorbar(aes(ymin = co2 - se, ymax = co2 + se), 
+                position = dodge,
+                width = 0.2) +
+  theme_ipsum(axis_title_size = 18,
+              plot_title_size = 25,
+              plot_title_face = "bold",
+              plot_title_margin = 0.5,
+              base_size = 18) +
+  scale_fill_manual(values = wes_palette("Chevalier1", n = 2)) +
+  labs(title = "CO2 net flux between soils and light treatment",
+       fill = "Light treatment",
+       y = "CO2 net flux",
+       x = "Soil")
+print(ag_co2plot)
+ggsave("plots/co2_soil_light.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+a_genus_bar <- read.csv("algae/algae_genus.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+sp_row <- sp_row %>% select(-soil) %>% rename(soil = sample) %>% select(soil, ocs_flux)
+a_genus_bar <- a_genus_bar %>% merge(sp_row, by = "soil", all.x = F, all.y = F) 
+tail(a_genus_bar)
+lm <- lm(ocs_flux~.-soil, data = a_genus_bar)
+summary(lm)
+
+
+## Nostoc in TL soils, preferably in the dark
+## Cylindrocystis in light LB soils.
+## LOTS of Carteria in LB dark soils
+## Nodosilinea and Microcoleus in dark DBZ soils
+## Eunotia are 1/4 of the community in light DBZ soils
+
+
+# Algae phylum
+cca_a_phylum <- graph_cca(a_phylum, soil_properties)
+x11(); print(cca_a_phylum)
+anosim(a_phylum, soil_properties$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is justified
+anosim(a_phylum, soil_properties$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(a_phylum ~ light_treatment * land_use * sand_content * ph, data = soil_properties) ## All variables have significant effects on communities
+nmds_a_phylum <- nmds_a(a_phylum)
+x11(); print(nmds_a_phylum)
+
+a_phylum_bar <- read.csv("algae/algae_phylum.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+a_phylum_bar <- melt(a_phylum_bar, id.vars = "soil", variable.name = "Phyla")
+a_phylum_bar %>% ggplot(aes(fill=Phyla, y=value, x=soil)) + 
+  geom_bar(position="stack", stat="identity")   ## Lots of cyanobacteria in DBZ dark and TL dark. Lots of Chlorophyta in LB dark.
+
+
+a_gas <- otu_gas %>% filter(group == "algae" & taxonomic_level == "phylum") %>% 
+  select(phyla, cos)
+data_plot <- graph_cca_gas_pos(a_phylum, soil_properties, a_gas, 0, 1, 0, 1)
+x11() ; print(data_plot)
+ggsave("plots/a_phylum_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+# Bacteria genus
+otu_gas_b_genus <- otu_gas %>% filter(group == "bacteria" & taxonomic_level == "genus") %>% 
+  select(phyla, cos)
+cca_b_genus <- graph_cca(b_genus, soil_properties, otu_gas_b_genus)
+x11(); print(cca_b_genus)
+ggsave("plots/b_genus_cca.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+anosim(b_genus, soil_properties$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is NOT JUSTIFIED
+anosim(b_genus, soil_properties$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(b_genus ~ light_treatment * land_use * sand_content * ph, data = soil_properties) ## light treatment * ph is not significant
+nmds_b_genus <- nmds_a(b_genus, soil_properties)
+x11(); print(nmds_b_genus)
+
+b_genus <- b_genus %>% mutate(t_abun = rowSums(b_genus))
+
+b_genus_dend <- b_genus %>% dist() %>% hclust() %>% as.dendrogram()
+par(mar = c(7, 3, 1, 1)) ; plot(b_genus_dend)
+
+
+b_genus_bar <- read.csv("bacteria/bacteria_genus.csv",
+                         dec = ",",
+                         sep = ";",
+                         fileEncoding="UTF-8-BOM")
+b_genus_bar <- melt(b_genus_bar, id.vars = "soil", variable.name = "otu")
+b_genus_bar <- b_genus_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+b_genus_bar <- b_genus_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- b_genus_bar %>% sapply(function(otu) length(unique(otu))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+b_genus_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(title= "Bacterial diversity in soils at class taxonomic level", 
+       subtitle = "Only bacterial genus >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Bacteria genus") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/b_genus_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+b_genus_bar <- read.csv("bacteria/bacteria_genus.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+sp_cos <- sp_row %>% select(sample, ocs_flux, soil)
+b_genus_bar <- b_genus_bar %>% rename(sample = soil)
+b_genus_bar <- merge(b_genus_bar, sp_cos, by = "sample", all.x = F, all.y = F)
+b_dbz <- b_genus_bar %>% filter(soil == "DBZ")
+cor<- cor.test(b_dbz$Acidothermus, b_dbz$ocs_flux)
+pval <- as.matrix(cor$p.value)
+
+plot_net(a_genus, maxdist = 0.4, point_label = "Sample_ID")
+
+b_genus_gas <- graph_cca_gas(b_genus, soil_properties, otu_gas_b_genus)
+plot(b_genus_gas)
+ggsave("plots/b_genus_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+family_gas <- otu_gas %>% filter(group == "bacteria" & taxonomic_level == "family") %>% 
+  select(phyla, cos)
+b_family_gas <- graph_cca_gas(b_family, soil_properties, family_gas)
+plot(b_family_gas)
+ggsave("plots/b_family_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+class_gas <- otu_gas %>% filter(group == "bacteria" & taxonomic_level == "class") %>% 
+  select(phyla, cos)
+b_class_gas <- graph_cca_gas(b_class, soil_properties, class_gas)
+plot(b_class_gas)
+ggsave("plots/b_class_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+data_log <- b_genus %>% decostand("log")
+data_cca <- cca(data_log ~ ocs_flux + co2_flux, data = soil_properties)
+data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+data_sites <- cbind(data_sites, soil_properties[,1])  # to add light treatment
+colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                        soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                        soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                        soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+data_plot <- ggplot()
+data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+  scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+  guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+data_biplots <- ordiArrowMul(data_scrs$biplot)
+data_arrows <- data_scrs$biplot * data_biplots
+colnames(data_arrows) <- c("x", "y")
+data_arrows <- as.data.frame(data_arrows)
+data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                      arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                         mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+data_otus <- as.data.frame(data_scrs$species)
+colnames(data_otus) <- c("x", "y")
+cna <- as.data.frame(colSums(b_genus))
+colnames(cna) <- c("sum")
+data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+colnames(data_otus) <- c("phyla", "x", "y", "sum")
+data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+cos_color <- c("uptake" = "green", "emission" = "red")
+data_plot <- data_plot + theme_bw() + 
+  labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+  scale_color_manual(values = cos_color)
+data_spec <- data_otus %>% filter(x < -0.5 & y < -0.5)
+data_plot <- data_plot + geom_text_repel(data_spec, mapping = aes(x,y, label=data_spec$phyla), family = "Garamond", max.iter = 10000, size = 5)
+data_otus_cos <- merge(data_otus, otu_gas_b_genus, by = "phyla", all.x= F, all.y= F)
+data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                             legend.text = element_text(size = 15),
+                             legend.title = element_text(size = 20)) +
+  geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5)
+plot(data_plot)
+ggsave("plots/b_genus_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+
+y <- as.matrix(b_genus)
+X <- soil_properties %>% select(ocs_flux, co2_flux) %>% scale() %>% as.matrix
+?scale
+
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(y, X, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fit_env <- gllvm(y, X, family = "negative.binomial", num.lv = 2,
+                 formula = ~ ocs_flux + co2_flux, seed = 1234)
+cplot<- coefplot(fit_env, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+                 xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+                 main = "Algae Phylum")
+
+### With environmental variables
+cr <- getResidualCor(fit_env)
+c1 <- corrplot(cr[order.single(cr), order.single(cr)], diag = FALSE, type = "lower", 
+               method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+x11(); print(c1)
+
+
+### Without environmental variables
+fit3lv <- gllvm(y, family = "negative.binomial", num.lv = 3, seed = 1234)
+cr0 <- getResidualCor(fit3lv)
+corrplot(cr0[order.single(cr0), order.single(cr0)], diag = FALSE, type = "lower", 
+         method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+## Acidothermus in LB soils, no matter the light treatment
+## Enterobacter in 4 DBZ soils, including the 3 dark soils ; and in the dark TL soils.
+
+
+# Bacteria phylum
+cca_b_phylum <- graph_cca(b_phylum)
+print(cca_b_phylum)
+ggsave("plots/b_phylum_test.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+cca_b_phylum_gas <- graph_cca_gas(b_phylum)
+print(cca_b_phylum_gas)
+ggsave("plots/b_phylum_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+anosim(b_phylum, soil_properties$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is NOT JUSTIFIED
+anosim(b_phylum, soil_properties$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(b_phylum ~ light_treatment * land_use * sand_content * ph, data = soil_properties) ## light treatment * ph is not significant
+nmds_b_phylum <- nmds_a(b_phylum)
+x11(); print(nmds_b_phylum)
+
+b_phylum_bar <- read.csv("bacteria/bacteria_phylum.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+b_phylum_bar <- melt(b_phylum_bar, id.vars = "soil", variable.name = "Phyla")
+b_phylum_bar <- b_phylum_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+b_phylum_bar <- b_phylum_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- b_phylum_bar %>% sapply(function(Phyla) length(unique(Phyla))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(Phyla) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+b_phylum_bar %>% ggplot(aes(fill=Phyla, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(title= "Bacterial diversity in soils at class taxonomic level", 
+       subtitle = "Only bacterial phylum >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Bacteria phylum") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/b_phylum_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+## Actinobacteria are more abundant in LB than elsewhere.
+                                               ## Less Thaumarchaeota in LB than in other soils. =  sensitive ammonia oxydizer
+
+
+y <- as.matrix(b_phylum)
+X <- soil_properties %>% select(ocs_flux, co2_flux) %>% scale() %>% as.matrix
+?scale
+
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(y, X, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fit_env <- gllvm(y, X, family = "negative.binomial", num.lv = 2,
+                 formula = ~ ocs_flux + co2_flux, seed = 1234)
+cplot<- coefplot(fit_env, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+                 xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+                 main = "Algae Phylum")
+
+### With environmental variables
+cr <- getResidualCor(fit_env)
+c1 <- corrplot(cr[order.single(cr), order.single(cr)], diag = FALSE, type = "lower", 
+               method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+x11(); print(c1)
+
+
+### Without environmental variables
+fit3lv <- gllvm(y, family = "negative.binomial", num.lv = 3, seed = 1234)
+cr0 <- getResidualCor(fit3lv)
+corrplot(cr0[order.single(cr0), order.single(cr0)], diag = FALSE, type = "lower", 
+         method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+
+# Fungi genus
+f_gas <- otu_gas %>% filter(group == "fungi" & taxonomic_level == "genus") %>% 
+  select(phyla, cos)
+cca_f_genus <- graph_cca(f_genus, soil_properties_f, f_gas)
+x11(); print(cca_f_genus)
+ggsave("plots/f_genus_cca.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+anosim(f_genus, soil_properties_f$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is NOT JUSTIFIED
+anosim(f_genus, soil_properties_f$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(f_genus ~ light_treatment * land_use * sand_content * ph, data = soil_properties_f) ## light_treatment:land_use is not significant
+nmds_f_genus <- nmds_f(f_genus)
+x11(); print(nmds_f_genus)
+
+f_genus <- f_genus %>% mutate(t_abun = rowSums(f_genus))
+f_class <- f_class %>% mutate(t_abun = rowSums(f_class))
+
+
+f_genus_bar <- read.csv("fungi/fungi_genus.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+f_genus_bar <- melt(f_genus_bar, id.vars = "soil", variable.name = "otu")
+f_genus_bar <- f_genus_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+f_genus_bar <- f_genus_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- f_genus_bar %>% sapply(function(otu) length(unique(otu))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+f_genus_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(title= "Fungal diversity in soils at genus taxonomic level", 
+       subtitle = "Only fungal genus >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Fungi genus") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/f_genus_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+cca_f_genus_gas <- graph_cca_gas(f_genus, soil_properties_f, f_gas)
+print(cca_f_genus_gas)
+ggsave("plots/f_genus_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+# Fungi phylum
+cca_f_phylum <- graph_cca_f(f_phylum)
+x11(); print(cca_f_phylum)
+cca_f_phylum_gas <- graph_cca_f_gas(f_phylum)
+print(cca_f_phylum_gas)
+ggsave("plots/f_phylum_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+anosim(f_phylum, soil_properties_f$light_treatment, distance = "bray", permutations = 9999) ## Grouping by light is NOT JUSTIFIED
+anosim(f_phylum, soil_properties_f$soil, distance = "bray", permutations = 9999) ## Grouping by soil is justified
+adonis2(f_phylum ~ light_treatment * land_use * sand_content * ph, data = soil_properties_f) ## light_treatment:land_use is not significant (p = 0.053)
+nmds_f_phylum <- nmds_f(f_phylum)
+x11(); print(nmds_f_phylum)
+
+f_phylum_bar <- read.csv("fungi/fungi_phylum.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+f_phylum_bar <- melt(f_phylum_bar, id.vars = "soil", variable.name = "otu")
+f_phylum_bar <- f_phylum_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 1)
+f_phylum_bar <- f_phylum_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- f_phylum_bar %>% sapply(function(otu) length(unique(otu))) %>% as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+f_phylum_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(title= "Fungal diversity in soils at phylum taxonomic level", 
+       subtitle = "Only fungal phylum >1% relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Fungi phylum") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/f_phylum_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+
+data_log <- f_genus %>% decostand("log")
+data_cca <- cca(data_log ~ ocs_flux + co2_flux, data = soil_properties_f)
+data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+data_sites <- cbind(data_sites, soil_properties_f[,1])  # to add light treatment
+colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                        soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                        soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                        soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+data_plot <- ggplot()
+data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+  scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+  guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+data_biplots <- ordiArrowMul(data_scrs$biplot)
+data_arrows <- data_scrs$biplot * data_biplots
+colnames(data_arrows) <- c("x", "y")
+data_arrows <- as.data.frame(data_arrows)
+data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                      arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                         mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+data_otus <- as.data.frame(data_scrs$species)
+colnames(data_otus) <- c("x", "y")
+cna <- as.data.frame(colSums(f_genus))
+colnames(cna) <- c("sum")
+data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+colnames(data_otus) <- c("phyla", "x", "y", "sum")
+data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+cos_color <- c("uptake" = "green", "emission" = "red")
+data_plot <- data_plot + theme_bw() + 
+  labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+  scale_color_manual(values = cos_color)
+data_spec <- data_otus %>% filter(x < -1 & y < 0)
+data_plot <- data_plot + geom_text_repel(data_spec, mapping = aes(x,y, label=data_spec$phyla), family = "Garamond", max.iter = 10000, size = 5)
+data_otus_cos <- merge(data_otus, f_gas, by = "phyla", all.x= F, all.y= F)
+data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                             legend.text = element_text(size = 15),
+                             legend.title = element_text(size = 20)) +
+  geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5)
+plot(data_plot)
+ggsave("plots/f_genus_cca_gas.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+
+## Model with environmental variables ## GLLVM
+
+test <- a_phylum[,-(which(colSums(a_phylum) < 100))]
+y <- as.matrix(test)
+X <- soil_properties %>% select(ocs_flux, co2_flux) %>% scale() %>% as.matrix
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(y, X, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fit_env <- gllvm(y, X, family = "negative.binomial", num.lv = 3,
+                 formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fit_env, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae phylum")
+
+### With environmental variables
+cr <- getResidualCor(fit_env)
+c1 <- corrplot(cr[order.single(cr), order.single(cr)], diag = FALSE, type = "lower", 
+         method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+x11(); print(c1)
+
+
+### Without environmental variables
+fit3lv <- gllvm(y, family = "negative.binomial", num.lv = 3, seed = 1234)
+cr0 <- getResidualCor(fit3lv)
+corrplot(cr0[order.single(cr0), order.single(cr0)], diag = FALSE, type = "lower", 
+         method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "red")
+
+
+
+algae <- a_genus[-18,-(which(colSums(a_genus) < 1000))]
+bacteria <- b_genus[-18,-(which(colSums(b_genus) < 1000))]
+fungi <- f_genus[,-(which(colSums(f_genus) < 1000))]
+y <- as.matrix(cbind(algae, bacteria, fungi))
+X <- soil_properties_f %>% select(ocs_flux, co2_flux) %>% scale() %>% as.matrix
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(y, X, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fit_env <- gllvm(y, X, family = "negative.binomial", num.lv = 5,
+                 formula = ~ ocs_flux + co2_flux, seed = 1234)
+cr <- getResidualCor(fit_env)
+par(mfrow = c(1,1))
+corrplot(cr[order.single(cr), order.single(cr)], diag = FALSE, type = "lower", method = "square", tl.cex = 0.5, tl.srt = 45, tl.col = "black")
+x11(); print(c1)
+
+
+
+test <- a_phylum %>% mutate(light = soil_properties$light_treatment) 
+test <- test[,-(which(colSums(a_phylum) < 100))]
+testl <- test %>% filter(light == "light") %>% select(-light)
+testd <- test %>% filter(light == "dark") %>% select(-light)
+
+
+
+
+
+
+## 1 / The table
+
+library(gridExtra)
+sp_print <- soil_properties %>% select(-sample_light, -bulk_density,
+                                       -volumetric_water, -total_biomass,
+                                       -ocs_flux, -co2_flux, -chamber)
+sp_print <- sp_print %>% group_by(soil, light_treatment) %>% summarize(pH = mean(ph),
+                                                                       sand_content = mean(sand_content),
+                                                                       silt_content = mean(silt_content),
+                                                                       clay_content = mean(clay_content),
+                                                                       cn_ratio = mean(cn_ratio))
+sp_print <- sp_print %>% mutate_if(is.numeric, round, digits=2)
+sp_print$land_use = c("cropland", "cropland","pine plantation", "pine plantation","cropland", "cropland","cropland","cropland")
+sp_print <- sp_print[,c(1,2,8,3,4,5,6,7)]
+colnames(sp_print) = c("Soil","Light treatment", "Land use", "pH", "Sand content", "Silt content", "Clay content",
+                       "C/N ratio")
+png("plots/test.png", height = 50*nrow(sp_print), width = 200*ncol(sp_print))
+grid.table(sp_print, rows = NULL)
+dev.off()
+
+
+## 2 / Permanovas
+a_g <- a_genus %>% mutate(non_identified = Environmental + Unknown + Unclassified) %>% select(- Environmental, -Unknown, -Unclassified)
+row <- c("Light treatment", "Soil", "Light treatment x Soil", "Residuals", "Total")
+results <- adonis(a_g ~ light_treatment * soil, data = soil_properties)
+results <- as.data.frame(results$aov.tab)
+results <- results %>% mutate_if(is.numeric, round, digits=3)
+rownames(results) <- row
+png("plots/2]Permanovas/a_genus_perm.png", height = 50*nrow(results), width = 200*ncol(results))
+grid.table(results)
+dev.off()
+
+b_g <- b_genus %>% mutate(non_identified = Environmental + Unknown + Unclassified) %>% select(- Environmental, -Unknown, -Unclassified)
+row <- c("Light treatment", "Soil", "Light treatment x Soil", "Residuals", "Total")
+results <- adonis(b_g ~ light_treatment * soil, data = soil_properties)
+results <- as.data.frame(results$aov.tab)
+results <- results %>% mutate_if(is.numeric, round, digits=3)
+rownames(results) <- row
+png("plots/2]Permanovas/b_genus_perm.png", height = 50*nrow(results), width = 200*ncol(results))
+grid.table(results)
+dev.off()
+
+f_g <- f_genus %>% mutate(non_identified = Environmental + Unknown + Unclassified) %>% select(- Environmental, -Unknown, -Unclassified)
+row <- c("Light treatment", "Soil", "Light treatment x Soil", "Residuals", "Total")
+results <- adonis(f_g ~ light_treatment * soil, data = soil_properties_f)
+results <- as.data.frame(results$aov.tab)
+results <- results %>% mutate_if(is.numeric, round, digits=3)
+rownames(results) <- row
+png("plots/2]Permanovas/f_genus_perm.png", height = 50*nrow(results), width = 200*ncol(results))
+grid.table(results)
+dev.off()
+
+## 3 / LME Gas
+
+alme <- lme(ocs_flux ~ light_treatment * soil ,random = ~1|chamber, data = soil_properties)
+blme <- lme(co2_flux ~ light_treatment * soil ,random = ~1|chamber, data = soil_properties)
+anova(alme)
+anova(blme)
+
+
+## 4 / Community barplots
+test <- a_class %>% mutate(sum = rowSums(a_class))
+a_class_bar <- read.csv("algae/algae_class.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+a_class_bar <- melt(a_class_bar, id.vars = "soil", variable.name = "otu")
+a_class_bar <- a_class_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 0.5)
+a_class_bar <- a_class_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- a_class_bar %>% sapply(function(otu) length(unique(otu))) %>% 
+  as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+a_class_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(subtitle = "Only algal classes with >0.5% of relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Algal class") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/4]Community barplots/a_class_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+a_phylum_bar <- read.csv("algae/algae_phylum.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+a_phylum_bar <- melt(a_phylum_bar, id.vars = "soil", variable.name = "otu")
+a_phylum_bar <- a_phylum_bar %>% mutate(r_abundance = value / 30100 * 100) %>% filter(r_abundance > 0.01)
+a_phylum_bar <- a_phylum_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- a_phylum_bar %>% sapply(function(otu) length(unique(otu))) %>% 
+  as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+a_phylum_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(subtitle = "Only algal phylumes with >0.01% of relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Algal phylum") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/4]Community barplots/a_phylum_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+b_class_bar <- read.csv("bacteria/bacteria_class.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+b_class_bar <- melt(b_class_bar, id.vars = "soil", variable.name = "otu")
+b_class_bar <- b_class_bar %>% mutate(r_abundance = value / 20800 * 100) %>% filter(r_abundance > 0.5)
+b_class_bar <- b_class_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- b_class_bar %>% sapply(function(otu) length(unique(otu))) %>% 
+  as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+b_class_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(subtitle = "Only bacterial classes with >0.5% of relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Bacterial class") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors) 
+
+ggsave("plots/4]Community barplots/b_class_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+x11()
+test <- f_class %>% mutate(sum = rowSums(f_class))
+f_class_bar <- read.csv("fungi/fungi_class.csv",
+                        dec = ",",
+                        sep = "\t",
+                        fileEncoding="UTF-8-BOM")
+f_class_bar <- melt(f_class_bar, id.vars = "soil", variable.name = "otu")
+f_class_bar <- f_class_bar %>% mutate(r_abundance = value / 7500 * 100) %>% filter(r_abundance > 0.5)
+f_class_bar <- f_class_bar %>% group_by(soil) %>%  mutate(r_abundance2 = r_abundance / sum(r_abundance)*100)
+nb.cols <- f_class_bar %>% sapply(function(otu) length(unique(otu))) %>% 
+  as.data.frame() %>% t() %>% as.data.frame() %>% select(otu) %>% as.matrix()
+mycolors <- colorRampPalette(brewer.pal(8, "Set2"))(nb.cols)
+f_class_bar %>% ggplot(aes(fill=otu, y=r_abundance2, x=soil)) + ## Lots of unknowns when soils are in the dark (probably unidentified cyanobacterias?). Lots of Chlorophyceae in LB dark. 
+  geom_bar(position="stack", stat="identity") +              # Good amounts of Zygnemophyceae and Bacillariophyceae respectively in light LB and light DBZ.
+  labs(subtitle = "Only fungal classes with >0.5% of relative abundance in each soils are included",
+       y = "Relative abundance (%)",
+       x = "Soil sample",
+       fill = "Fungal class") +
+  coord_cartesian(ylim = c(0, 100)) +
+  theme_ipsum_ps(axis_title_size = 13,
+                 plot_title_face = "bold") + scale_fill_manual(values = mycolors)
+
+ggsave("plots/4]Community barplots/f_class_community.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+## 5 / CCA
+
+aotu <- otu_gas %>% filter(group == "algae" & taxonomic_level == "class")
+a_cca <- graph_cca(a_class, soil_properties, aotu)
+x11();print(a_cca)
+ggsave("plots/5] CCA/a_class_CCA.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+botu <- otu_gas %>% filter(group == "bacteria" & taxonomic_level == "class")
+b_cca <- graph_cca(b_class, soil_properties, botu)
+x11();print(b_cca)
+ggsave("plots/5] CCA/b_class_CCA.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+fotu <- otu_gas %>% filter(group == "fungi" & taxonomic_level == "class")
+f_cca <- graph_cca(f_class, soil_properties, fotu)
+x11();print(f_cca)
+ggsave("plots/5] CCA/f_class_CCA.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+
+## 6 / Gas OTU coefplot
+a_class <- read.csv("algae/algae_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- a_class[,-(which(colSums(a_class) < 100))]
+y$light_treatment <- soil_properties$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100), -Sphagnopsida, -Polytrichopsida) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100), -Chlorokybophyceae) %>% as.matrix()
+X <- soil_properties %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 5,
+                 formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae light")
+summary(fitl)
+?gllvm
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yd, Xd, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae dark")
+
+a_order <- read.csv("algae/algae_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- a_order[,-(which(colSums(a_order) < 100))]
+y$light_treatment <- soil_properties$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100)) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100)) %>% as.matrix()
+X <- soil_properties %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae light")
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yd, Xd, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae dark")
+
+a_phylum <- read.csv("algae/algae_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- a_phylum[,-(which(colSums(a_phylum) < 100))]
+y$light_treatment <- soil_properties$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100)) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100)) %>% as.matrix()
+X <- soil_properties %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 3,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae light")
+ggsave("plots/6] LM gas/a_phylum_light.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yd, Xd, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 3,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Algae dark")
+ggsave("plots/6] LM gas/a_phylum_dark.png", plot = last_plot(), device = NULL, path = NULL,
+       scale = 1, width = NA, height = NA, units = "cm",
+       dpi = 300)
+
+b_class <- read.csv("bacteria/bacteria_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- b_class[,-(which(colSums(b_class) < 100))]
+y$light_treatment <- soil_properties$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100)) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100)) %>% as.matrix()
+X <- soil_properties %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Bacteria light")
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yd, Xd, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Bacteria dark")
+
+
+f_class <- read.csv("fungi/fungi_class.csv",
+                    dec = ",",
+                    sep = "\t",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- f_class[,-(which(colSums(f_class) < 100))]
+y$light_treatment <- soil_properties$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100)) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100)) %>% as.matrix()
+X <- soil_properties %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 3,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Fungi light")
+
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yd, Xd, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Fungi dark")
+
+
+corr1 <- a_class %>% select(Marchantiopsida)
+corr <- f_class %>% select(Glomeromycetes) %>% cbind(corr1)
+
+f_family <- read.csv("fungi/fungi_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+y <- f_family[,-(which(colSums(f_family) < 100))]
+y$light_treatment <- soil_properties_f$light_treatment
+yl <- y %>% filter(light_treatment == "light") %>% select(-light_treatment)
+yl <- yl %>% select(-which(colSums(yl) < 100), -Polyporaceae) %>% as.matrix()
+yd <- y %>% filter(light_treatment == "dark") %>% select(-light_treatment) 
+yd <- yd %>% select(-which(colSums(yd) < 100), -Platygloeaceae, -Entolomataceae, -Auriculariaceae) %>% as.matrix()
+X <- soil_properties_f %>% select(ocs_flux, co2_flux, light_treatment)
+Xl <- X %>% filter(light_treatment == "light") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+Xd <- X %>% filter(light_treatment == "dark") %>% select(-light_treatment) %>% scale() %>% as.matrix()
+criterias <- NULL
+for(i in 0:5){
+  fiti <- gllvm(yl, Xl, family = "negative.binomial", num.lv = i, sd.errors = FALSE, 
+                formula = ~ ocs_flux + co2_flux, seed = 1234)
+  criterias[i + 1] <- summary(fiti)$AICc
+  names(criterias)[i + 1] = i
+}
+criterias
+fitl <- gllvm(yl, Xl, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Fungi light")
+
+fitl <- gllvm(yd, Xd, family = "negative.binomial", num.lv = 5,
+              formula = ~ ocs_flux + co2_flux, seed = 1234)
+coefplot(fitl, cex.ylab = 0.7, mar = c(4, 9, 2, 1), 
+         xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,2),
+         main = "Fungi dark")
+
+
+f_family %>% select(Blastocladiaceae, Catenariaceae, Coelomomycetaceae, Physodermataceae) %>% print()
+
+
+
+
+## 7 / Network analysis 
+install.packages("tidygraph")
+install.packages("ggraph")
+install.packages("igraph")
+library(tidygraph)
+library(ggraph)
+library(igraph)
+install.packages("Hmisc") 
+library(Hmisc)  
+install.packages("Matrix") 
+library(Matrix)  
+
+otu.table <- cbind(a_class, b_class, f_class)
+otu.table.filter <- otu.table[ ,colSums(otu.table) >= 10]
+otu.cor <- rcorr(as.matrix(otu.table.filter), type="spearman")
+otu.pval <- forceSymmetric(otu.cor$P)
+p.yes <- otu.pval<0.05
+r.val = otu.cor$r # select all the correlation values 
+p.yes.r <- r.val*p.yes # only select correlation values based on p-value criterion 
+p.yes.r <- abs(p.yes.r)>0.75 # output is logical vector
+p.yes.rr <- p.yes.r*r.val # use logical vector for subscripting.
+adjm <- as.matrix(p.yes.rr)
+net.grph=graph.adjacency(adjm,mode="undirected",weighted=TRUE,diag=FALSE)
+edgew<-E(net.grph)$weight
+bad.vs<-V(net.grph)[degree(net.grph) == 0]
+net.grph <-delete.vertices(net.grph, bad.vs)
+class1 <- colnames(a_class)
+class2 <- colnames(b_class)
+class3 <- colnames(f_class)
+indclass <- stack(mget(ls(pattern = "class*")))
+cols <- c(class1="darkolivegreen2", 
+          class2="dodgerblue", 
+          class3="goldenrod4")
+V(net.grph)$color <- cols[ indclass$ind[match( V(net.grph)$name, indclass$values ) ] ]
+plot(net.grph,
+     vertex.size=8,
+     vertex.frame.color="black",
+     edge.curved=F,
+     edge.width=1.5,
+     layout=layout.fruchterman.reingold,
+     edge.color=ifelse(edgew < 0,"lightgrey","orangered2"),
+     vertex.label=NA,
+     vertex.label.color="black",
+     vertex.label.family="Times New Roman",
+     vertex.label.font=2)
+legend('topleft',legend=c("algae", "bacteria", "fungi"),pt.cex=2.5,col='black',pch=21, pt.bg=cols)
+
+ac <- a_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "light") %>% select(-light)
+bc <- b_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "light") %>% select(-light)
+fc <- f_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "light") %>% select(-light)
+otu.table <- cbind(a_class, b_class, f_class)
+otu.table.filter <- otu.table[ ,colSums(otu.table) >= 10]
+otu.cor <- rcorr(as.matrix(otu.table.filter), type="spearman")
+otu.pval <- forceSymmetric(otu.cor$P)
+p.yes <- otu.pval<0.05
+r.val = otu.cor$r # select all the correlation values 
+p.yes.r <- r.val*p.yes # only select correlation values based on p-value criterion 
+p.yes.r <- abs(p.yes.r)>0.75 # output is logical vector
+p.yes.rr <- p.yes.r*r.val # use logical vector for subscripting.
+adjm <- as.matrix(p.yes.rr)
+net.grph=graph.adjacency(adjm,mode="undirected",weighted=TRUE,diag=FALSE)
+edgew<-E(net.grph)$weight
+bad.vs<-V(net.grph)[degree(net.grph) == 0]
+net.grph <-delete.vertices(net.grph, bad.vs)
+class1 <- colnames(a_class)
+class2 <- colnames(b_class)
+class3 <- colnames(f_class)
+indclass <- stack(mget(ls(pattern = "class*")))
+cols <- c(class1="darkolivegreen2", 
+          class2="dodgerblue", 
+          class3="goldenrod4")
+V(net.grph)$color <- cols[ indclass$ind[match( V(net.grph)$name, indclass$values ) ] ]
+plot(net.grph,
+     vertex.size=8,
+     vertex.frame.color="black",
+     edge.curved=F,
+     edge.width=1.5,
+     layout=layout.fruchterman.reingold,
+     edge.color=ifelse(edgew < 0,"lightgrey","orangered2"),
+     vertex.label=NA,
+     vertex.label.color="black",
+     vertex.label.family="Times New Roman",
+     vertex.label.font=2)
+legend('topleft',legend=c("algae", "bacteria", "fungi"),pt.cex=2.5,col='black',pch=21, pt.bg=cols)
+
+
+ac <- a_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "dark") %>% select(-light)
+bc <- b_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "dark") %>% select(-light)
+fc <- f_class %>% mutate(light = soil_properties$light_treatment) %>% filter(light == "dark") %>% select(-light)
+otu.table <- cbind(a_class, b_class, f_class)
+otu.table.filter <- otu.table[ ,colSums(otu.table) >= 10]
+otu.cor <- rcorr(as.matrix(otu.table.filter), type="spearman")
+otu.pval <- forceSymmetric(otu.cor$P)
+p.yes <- otu.pval<0.05
+r.val = otu.cor$r # select all the correlation values 
+p.yes.r <- r.val*p.yes # only select correlation values based on p-value criterion 
+p.yes.r <- abs(p.yes.r)>0.75 # output is logical vector
+?abs
+p.yes.rr <- p.yes.r*r.val # use logical vector for subscripting.
+adjm <- as.matrix(p.yes.rr)
+net.grph=graph.adjacency(adjm,mode="undirected",weighted=TRUE,diag=FALSE)
+edgew<-E(net.grph)$weight
+bad.vs<-V(net.grph)[degree(net.grph) == 0]
+net.grph <-delete.vertices(net.grph, bad.vs)
+class1 <- colnames(a_class)
+class2 <- colnames(b_class)
+class3 <- colnames(f_class)
+indclass <- stack(mget(ls(pattern = "class*")))
+cols <- c(class1="darkolivegreen2", 
+          class2="dodgerblue", 
+          class3="goldenrod4")
+V(net.grph)$color <- cols[ indclass$ind[match( V(net.grph)$name, indclass$values ) ] ]
+plot(net.grph,
+     vertex.size=8,
+     vertex.frame.color="black",
+     edge.curved=F,
+     edge.width=1.5,
+     layout=layout.fruchterman.reingold,
+     edge.color=ifelse(edgew < 0,"lightgrey","orangered2"),
+     vertex.label=NA,
+     vertex.label.color="black",
+     vertex.label.family="Times New Roman",
+     vertex.label.font=2)
+legend('topleft',legend=c("algae", "bacteria", "fungi"),pt.cex=2.5,col='black',pch=21, pt.bg=cols)
+## DADA2 ##############################################################
+
+path <- "/home/clfoucault/Bureau/Fasta"
+
+# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
+fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_R2_001.fastq", full.names = TRUE))
+# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+# Visualizing quality profile of forward reads
+plotQualityProfile(fnFs[1:2])
+plotQualityProfile(fnRs[1:2]) # now for the reverse reads
+# Place filtered files in filtered/ subdirectory
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+# Apply standard filtering parameters
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,220),
+                     maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+                     compress=TRUE, multithread=TRUE,
+                     trimLeft = c(20,20)) # to remove primers
+head(out)
+# Learn the error rates
+errF <- learnErrors(filtFs, multithread=TRUE)
+errR <- learnErrors(filtRs, multithread=TRUE)
+plotErrors(errF, nominalQ=TRUE)
+# Apply the core sample inference algorithm to the filtered and trimmed sequence data
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+dadaFs[[1]]
+# Merge pair reads
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+# Inspect the merger data.frame from the first sample
+head(mergers[[1]])
+# Construct sequence table
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab)))
+# Remove chimeras
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+dim(seqtab.nochim)
+sum(seqtab.nochim)/sum(seqtab)
+# Track reads through the pipeline
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+head
+# Assign taxonomy [also see the alternative = DECIPHER]
+taxa <- assignTaxonomy(seqtab.nochim, "~/tax/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+# Inspect the taxonomic assignment
+taxa.print <- taxa # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+# Evaluate accuracy of taxonomic assignment
+unqs.mock <- seqtab.nochim["Mock",]
+unqs.mock <- sort(unqs.mock[unqs.mock>0], decreasing=TRUE) # Drop ASVs absent in the Mock
+cat("DADA2 inferred", length(unqs.mock), "sample sequences present in the Mock community.\n")
+mock.ref <- getSequences(file.path(path, "HMP_MOCK.v35.fasta"))
+match.ref <- sum(sapply(names(unqs.mock), function(x) any(grepl(x, mock.ref))))
+cat("Of those,", sum(match.ref), "were exact matches to the expected reference sequences.\n")
+
+
+## PHYLOSEQ ################################
+samples.out <- rownames(seqtab.nochim)
+subject <- sapply(strsplit(samples.out, "D"), `[`, 1)
+gender <- substr(subject,1,1)
+subject <- substr(subject,2,999)
+day <- as.integer(sapply(strsplit(samples.out, "D"), `[`, 2))
+samdf <- data.frame(Subject=subject, Gender=gender, Day=day)
+samdf$When <- "Early"
+samdf$When[samdf$Day>100] <- "Late"
+rownames(samdf) <- samples.out
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+ps <- prune_samples(sample_names(ps) != "Mock", ps) # Remove mock sample
+dna <- Biostrings::DNAStringSet(taxa_names(ps))
+names(dna) <- taxa_names(ps)
+ps <- merge_phyloseq(ps, dna)
+taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
+ps
+# We are now ready to use phyloseq ! 
+# Visualize alpha-diversity
+plot_richness(ps, x="Day", measures=c("Shannon", "Simpson"), color="When")
+# Transform data to proportions as appropriate for Bray-Curtis distances
+ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+ord.nmds.bray <- ordinate(ps.prop, method="NMDS", distance="bray")
+plot_ordination(ps.prop, ord.nmds.bray, color="When", title="Bray NMDS")
+# Barplot
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, x="Day", fill="Family") + facet_wrap(~When, scales="free_x")
+
+
+# to plot COS role of organisms
+graph_cca_cos <- function(data, data_sp, clean_otu_info) {
+  data_log <- b_genus %>% decostand("log")
+  data_cca <- cca(data_log ~ land_use + sand_content + ph + silt_content + cn_ratio + light_treatment, data = soil_properties)
+  data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+  data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+  data_sites <- cbind(data_sites, soil_properties[,1])  # to add light treatment
+  colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+  data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                          soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                          soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                          soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  data_plot <- ggplot()
+  data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+  data_biplots <- ordiArrowMul(data_scrs$biplot)
+  data_arrows <- data_scrs$biplot * data_biplots
+  colnames(data_arrows) <- c("x", "y")
+  data_arrows <- as.data.frame(data_arrows)
+  data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                        arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+  data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                           mapping = aes(x, y, label = rownames(data_arrows), family = "Garamond"), size = 8.5)## ARROWS LABELS
+  data_otus <- as.data.frame(data_scrs$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(b_genus))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("otu", "x", "y", "sum")
+  colnames(otu_gas_b_genus) <- c("otu", "cos_role")
+  data_otus <- merge(data_otus, otu_gas_b_genus, by = "otu", all.x= F, all.y= F)
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(otu %!in% c("Unclassified","Unknown")) 
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun, col = cos_role)) ## OTU POINTS
+  data_plot <- data_plot + theme_bw() + 
+    labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment") +
+    scale_color_gradient(low = "gold", high = "firebrick1")
+  data_otus <- data_otus %>% filter(relative_abun > 2)
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun, col = cos_role))
+  data_plot<-data_plot + geom_text_repel(data_otus,mapping = aes(x,y, label=data_otus$otu), family = "Garamond", max.iter = 10000, size = 5) +
+    theme(text=element_text(family="Garamond"),
+          legend.text = element_text(size = 15),
+          legend.title = element_text(size = 20))
+}
+

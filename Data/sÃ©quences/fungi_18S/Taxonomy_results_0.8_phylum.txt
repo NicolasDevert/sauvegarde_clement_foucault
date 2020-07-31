@@ -1,0 +1,27 @@
+Taxonomy_highest	Ascomycota	Basidiomycota	Blastocladiomycota	Chytridiomycota	Cryptomycota	Glomeromycota	Microsporidia	Neocallimastigomycota	Unknown	Unclassified	Environmental	
+Taxonomy_phylum	Ascomycota	Basidiomycota	Blastocladiomycota	Chytridiomycota	Cryptomycota	Glomeromycota	Microsporidia	Neocallimastigomycota	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_18S_ORCA_18S_S1_L001.fasta	6345	1717	36	790	17	315	0	4	345	722	909	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_18S_ORCA_18S_S1_L001.fasta	5578	2214	87	672	10	206	0	3	396	914	1120	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_18S_ORCA_18S_S1_L001.fasta	6231	1818	51	770	14	215	0	1	388	716	996	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_18S_ORCA_18S_S1_L001.fasta	4508	1222	258	2464	10	384	0	1	569	555	1229	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_18S_ORCA_18S_S1_L001.fasta	4397	1016	361	2935	6	251	0	3	515	471	1245	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_18S_ORCA_18S_S1_L001.fasta	3187	1161	152	4398	12	138	0	2	317	566	1267	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_G4_18S_ORCA_18S_S1_L001.fasta	3470	3104	35	371	5	262	0	1	349	2571	1032	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_18S_ORCA_18S_S1_L001.fasta	5537	2655	5	261	36	86	0	1	252	987	1380	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_18S_ORCA_18S_S1_L001.fasta	4802	2449	9	289	58	141	0	0	476	1067	1909	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_18S_ORCA_18S_S1_L001.fasta	5614	2621	15	193	40	136	0	0	306	843	1432	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_18S_ORCA_18S_S1_L001.fasta	5468	2492	11	287	42	209	0	1	391	927	1372	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_18S_ORCA_18S_S1_L001.fasta	4766	2242	15	772	11	467	0	1	667	1081	1178	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_18S_ORCA_18S_S1_L001.fasta	5410	2269	9	628	23	407	0	1	533	907	1013	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_18S_ORCA_18S_S1_L001.fasta	4276	1795	25	727	11	201	0	9	740	1360	2056	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_18S_ORCA_18S_S1_L001.fasta	3588	1770	589	1609	26	181	0	9	736	802	1890	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_18S_ORCA_18S_S1_L001.fasta	3867	2181	33	848	16	216	0	48	535	1360	2096	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_18S_ORCA_18S_S1_L001.fasta	3317	1933	78	1009	16	135	0	37	1228	1522	1925	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_18S_ORCA_18S_S1_L001.fasta	3449	1931	42	628	12	140	0	15	621	2962	1400	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_18S_ORCA_18S_S1_L001.fasta	2991	1629	20	523	8	292	0	0	1498	1574	2665	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_18S_ORCA_18S_S1_L001.fasta	2904	1562	22	616	3	462	0	3	1200	1847	2581	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_18S_ORCA_18S_S1_L001.fasta	2755	1644	11	512	5	455	0	3	1607	1665	2543	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_18S_ORCA_18S_S1_L001.fasta	2923	2340	376	465	11	561	0	4	1406	1067	2047	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_18S_ORCA_18S_S1_L001.fasta	2930	2439	312	499	18	480	0	0	1419	1161	1942	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_18S_ORCA_18S_S1_L001.fasta	2394	2358	220	434	10	656	0	4	2334	898	1892	
+

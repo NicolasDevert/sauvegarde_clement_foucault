@@ -1,0 +1,24 @@
+sample;light_treatment;land_use;ph;sand_content;silt_content;clay_content;cn_ratio;soil;sample_light
+DBZ1;light;cropland;7;822;57;91;13.9;DBZ;DBZ light
+DBZ2;light;cropland;7;822;57;91;13.9;DBZ;DBZ light
+DBZ3;light;cropland;7;822;57;91;13.9;DBZ;DBZ light
+DBZ4;dark;cropland;7;822;57;91;13.9;DBZ;DBZ dark
+DBZ5;dark;cropland;7;822;57;91;13.9;DBZ;DBZ dark
+DBZ6;dark;cropland;7;822;57;91;13.9;DBZ;DBZ dark
+LB1;light;pine plantation;4.6;947;26;27;26;LB;LB light
+LB2;light;pine plantation;4.6;947;26;27;26;LB;LB light
+LB3;light;pine plantation;4.6;947;26;27;26;LB;LB light
+LB4;dark;pine plantation;4.6;947;26;27;26;LB;LB dark 
+LB5;dark;pine plantation;4.6;947;26;27;26;LB;LB dark 
+LB6;dark;pine plantation;4.6;947;26;27;26;LB;LB dark 
+LG1;light;cropland;6.3;184;647;169;10.4;LG;LG light
+LG2;light;cropland;6.3;184;647;169;10.4;LG;LG light
+LG3;light;cropland;6.3;184;647;169;10.4;LG;LG light
+LG4;dark;cropland;6.3;184;647;169;10.4;LG;LG dark
+LG5;dark;cropland;6.3;184;647;169;10.4;LG;LG dark
+TL1;light;cropland;8.1;167;523;310;10.4;TL;TL light
+TL2;light;cropland;8.1;167;523;310;10.4;TL;TL light
+TL3;light;cropland;8.1;167;523;310;10.4;TL;TL light
+TL4;dark;cropland;8.1;167;523;310;10.4;TL;TL dark
+TL5;dark;cropland;8.1;167;523;310;10.4;TL;TL dark
+TL6;dark;cropland;8.1;167;523;310;10.4;TL;TL dark

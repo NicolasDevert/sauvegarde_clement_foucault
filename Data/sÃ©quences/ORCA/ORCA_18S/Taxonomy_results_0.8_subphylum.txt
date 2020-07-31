@@ -1,0 +1,28 @@
+Taxonomy_highest	Ascomycota	Ascomycota	Ascomycota	Basidiomycota	Basidiomycota	Basidiomycota	Fungi_incertae_sedis	Fungi_incertae_sedis	Fungi_incertae_sedis	Fungi_incertae_sedis	Fungi_incertae_sedis	Unknown	Unclassified	Environmental	
+Taxonomy_subphylum	Pezizomycotina	Saccharomycotina	Taphrinomycotina	Basidiomycota incertae sedis	Pucciniomycotina	Ustilaginomycotina	Entomophthoromycotina	Kickxellomycotina	Mortierellomycotina	Mucoromycotina	Zoopagomycotina	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3305	65	17	0	17	13	5	19	339	285	19	281	2478	657	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2808	101	5	0	17	6	6	39	413	313	26	312	2641	813	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3268	72	14	0	17	3	8	12	364	197	26	315	2448	756	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2141	77	6	0	26	18	81	13	185	172	16	535	3636	594	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2016	91	6	0	6	40	134	6	114	123	8	486	3778	692	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1501	79	9	0	19	16	19	11	234	150	12	225	4494	731	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_G4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1775	60	2	0	31	12	4	33	1550	326	25	210	2817	655	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3206	107	0	0	268	3	1	12	398	184	35	179	2127	980	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2821	127	1	0	276	5	0	9	402	222	21	322	2003	1291	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3080	121	1	0	241	1	1	14	362	175	29	219	2200	1056	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3077	137	0	0	274	0	0	8	370	184	20	306	2138	986	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2695	163	0	0	292	3	0	4	318	210	29	490	2426	870	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	3009	139	0	0	206	2	0	11	338	204	40	380	2452	719	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2237	91	3	0	48	6	0	23	912	157	67	532	2082	1342	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1871	72	5	0	26	2	9	5	487	80	34	509	3157	1243	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	2048	59	3	0	27	5	8	19	791	185	27	419	2467	1442	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1683	49	4	0	42	14	1	10	1016	119	8	925	2306	1323	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1729	55	15	0	32	4	1473	38	599	108	32	456	1988	971	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1399	69	9	0	41	4	1	9	500	115	28	544	3467	1314	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1499	59	3	0	45	6	5	19	1046	137	23	1022	1801	1835	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1390	82	0	0	40	3	2	18	1236	203	22	786	1945	1773	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1288	49	2	0	50	4	4	26	1154	78	18	1094	1945	1788	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1614	18	0	0	800	1	7	11	610	103	9	914	2153	1260	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1624	44	3	0	1099	4	80	4	617	100	21	939	1805	1160	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	1179	40	2	0	847	3	114	5	451	98	10	1647	1961	1143	
+

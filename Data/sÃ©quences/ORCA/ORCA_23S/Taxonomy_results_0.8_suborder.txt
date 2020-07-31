@@ -1,0 +1,32 @@
+Taxonomy_highest	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Unknown	Unclassified	Environmental	
+Taxonomy_intermediate									
+Taxonomy_intermediate	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida
+Taxonomy_intermediate	Pelliidae	Jungermanniidae	Jungermanniidae	Jungermanniidae	Jungermanniidae	Pelliidae	Jungermanniidae	Jungermanniidae	Jungermanniidae
+Taxonomy_intermediate	Pallaviciniales	Porellales	Jungermanniales	Jungermanniales	Jungermanniales	Fossombroniales	Jungermanniales	Porellales	Porellales
+Taxonomy_suborder	Pallaviciniineae	Porellineae	Jungermanniineae	Lophocoleineae	Cephaloziineae	Fossombroniineae	Perssoniellineae	Jubulineae	Radulineae	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9809	191	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9794	206	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9858	142	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9980	20	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9971	29	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9966	34	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_ETL1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	1	0	0	0	9468	531	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	2	0	0	0	0	0	6730	3268	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	6314	3686	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	7783	2217	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9673	327	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9742	258	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9828	172	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9893	107	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9941	59	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9875	125	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9968	32	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9923	77	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9950	50	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9558	442	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9781	219	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9789	211	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9993	7	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9993	7	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_23S_ORCA_23S_S2_L001_R1_001_prinseq_good.extendedFrags.fasta	0	0	0	0	0	0	0	0	0	9991	9	0	
+

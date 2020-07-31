@@ -1,0 +1,32 @@
+Taxonomy_highest	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Marchantiophyta	Unknown	Unclassified	Environmental	
+Taxonomy_intermediate									
+Taxonomy_intermediate	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida	Jungermanniopsida
+Taxonomy_intermediate	Pelliidae	Jungermanniidae	Jungermanniidae	Jungermanniidae	Jungermanniidae	Pelliidae	Jungermanniidae	Jungermanniidae	Jungermanniidae
+Taxonomy_intermediate	Pallaviciniales	Porellales	Jungermanniales	Jungermanniales	Jungermanniales	Fossombroniales	Jungermanniales	Porellales	Porellales
+Taxonomy_suborder	Pallaviciniineae	Porellineae	Jungermanniineae	Lophocoleineae	Cephaloziineae	Fossombroniineae	Perssoniellineae	Jubulineae	Radulineae	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29634	466	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29539	561	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29780	320	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30043	57	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30072	28	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30070	30	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_ETL1_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	5	0	0	0	28624	1471	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	20041	10059	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	19245	10855	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	23353	6747	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29011	1089	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29359	741	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29612	488	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29917	183	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30069	31	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29792	308	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30056	44	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29989	111	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG6_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30089	11	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	28858	1242	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29507	593	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	29477	623	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30077	23	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30092	8	0	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_23S_ORCA_23S_S2_L001.fasta	0	0	0	0	0	0	0	0	0	30086	14	0	
+

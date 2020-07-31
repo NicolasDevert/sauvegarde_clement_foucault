@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580741219961.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A6D87A33",
+    "lastKnownWriteTime" : 6229725566399701794,
+    "last_content_update" : 1580741219961,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "93130915",
+        "caption" : "soil_properties",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=soil_properties&cache_key=93130915",
+        "displayedObservations" : "24",
+        "environment" : "",
+        "expression" : "soil_properties",
+        "object" : "soil_properties",
+        "preview" : "0",
+        "totalObservations" : "24",
+        "variables" : "7"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

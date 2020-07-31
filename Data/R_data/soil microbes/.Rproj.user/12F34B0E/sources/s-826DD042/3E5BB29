@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584530401235.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3E5BB29",
+    "lastKnownWriteTime" : 1584527645,
+    "last_content_update" : 1584527645,
+    "path" : "E:/Bureau/FungiFG.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "862,0",
+        "scrollLine" : "855"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

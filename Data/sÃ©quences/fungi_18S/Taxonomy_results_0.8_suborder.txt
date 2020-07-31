@@ -1,0 +1,31 @@
+Taxonomy_highest	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Unknown	Unclassified	Environmental	
+Taxonomy_intermediate	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina						
+Taxonomy_intermediate	Dothideomycetes	Lecanoromycetes	Lecanoromycetes	Lecanoromycetes	Lecanoromycetes	Agaricomycetes	Agaricomycetes	Agaricomycetes	Agaricomycetes	Agaricomycetes	Agaricomycetes
+Taxonomy_intermediate	Pleosporomycetidae	Lecanoromycetidae	Lecanoromycetidae	Lecanoromycetidae	Lecanoromycetidae	Agaricomycetidae	Agaricomycetidae	Agaricomycetidae	Agaricomycetidae	Agaricomycetidae	Agaricomycetidae
+Taxonomy_intermediate											
+Taxonomy_suborder	Pleosporineae	Collematineae	Lecanorineae	Peltigerineae	Teloschistales	Boletineae	Coniophorineae	Paxilineae	Sclerodermatineae	Suillineae	Tapinellineae	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_18S_ORCA_18S_S1_L001.fasta	103	0	1	0	0	1	4	0	0	0	0	343	9964	784	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_18S_ORCA_18S_S1_L001.fasta	121	0	3	4	0	1	121	0	0	0	21	394	9539	996	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_18S_ORCA_18S_S1_L001.fasta	97	0	1	0	1	1	11	0	0	0	0	389	9826	874	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_18S_ORCA_18S_S1_L001.fasta	89	0	7	0	0	1	17	0	0	0	1	685	9598	802	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_18S_ORCA_18S_S1_L001.fasta	109	0	3	0	0	0	1	0	1	1	0	601	9524	960	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_18S_ORCA_18S_S1_L001.fasta	110	0	3	0	0	3	7	0	0	0	0	299	9806	972	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_G4_18S_ORCA_18S_S1_L001.fasta	173	0	0	0	0	15	186	1	1	1	0	357	9531	935	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_18S_ORCA_18S_S1_L001.fasta	94	0	4	0	4	4	201	0	0	65	12	259	9249	1308	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_18S_ORCA_18S_S1_L001.fasta	46	0	1	0	10	1	163	0	0	7	5	483	8639	1845	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_18S_ORCA_18S_S1_L001.fasta	54	0	2	0	11	3	325	0	0	7	5	308	9131	1354	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_18S_ORCA_18S_S1_L001.fasta	63	0	3	0	6	2	294	1	0	10	0	397	9126	1298	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_18S_ORCA_18S_S1_L001.fasta	26	0	5	1	8	1	68	0	0	21	1	663	9303	1103	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_18S_ORCA_18S_S1_L001.fasta	48	0	5	0	43	0	231	2	0	6	2	535	9393	935	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_18S_ORCA_18S_S1_L001.fasta	272	0	1	0	0	2	2	0	0	1	1	753	8179	1989	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_18S_ORCA_18S_S1_L001.fasta	126	0	4	2	0	0	3	0	0	0	0	743	8512	1810	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_18S_ORCA_18S_S1_L001.fasta	225	0	4	0	0	3	12	0	0	1	7	544	8387	2017	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_18S_ORCA_18S_S1_L001.fasta	218	0	2	1	0	3	5	0	0	1	0	1235	7902	1833	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_18S_ORCA_18S_S1_L001.fasta	260	0	2	0	0	4	7	0	0	1	0	638	8943	1345	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_18S_ORCA_18S_S1_L001.fasta	112	0	2	0	0	0	28	1	0	2	7	1501	6944	2603	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_18S_ORCA_18S_S1_L001.fasta	153	0	0	0	0	4	24	0	0	1	0	1200	7312	2506	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_18S_ORCA_18S_S1_L001.fasta	114	0	0	0	0	1	18	0	0	0	0	1611	7006	2450	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_18S_ORCA_18S_S1_L001.fasta	829	0	5	0	0	4	5	0	0	0	1	1367	7103	1886	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_18S_ORCA_18S_S1_L001.fasta	749	0	0	1	0	3	7	0	0	2	1	1356	7311	1770	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_18S_ORCA_18S_S1_L001.fasta	443	0	8	0	0	2	11	0	1	1	8	2281	6647	1798	
+

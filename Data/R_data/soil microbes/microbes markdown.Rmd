@@ -1,0 +1,492 @@
+---
+title: "Statistical methods to study microbial communities"
+author: "C.F."
+date: "24 février 2020"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+  fig_caption: yes
+---
+
+
+```{r Package Loading, include=FALSE}
+library(devtools)
+library(plyr)
+library(tidyverse)
+library(vegan)
+library(labdsv)
+library(gridExtra)
+library(ggpubr)
+library(extrafont)
+library(ggrepel)
+library(dada2); packageVersion("dada2") 
+`%!in%` <- function(a,b) ! a %in% b
+library(grid)
+library(phyloseq)
+library(esquisse)
+library(dendextend)
+library(reshape2)
+library(viridis)
+library(hrbrthemes)
+hrbrthemes::import_roboto_condensed()
+library(wesanderson)
+library(RColorBrewer)
+library(rmarkdown)
+```
+
+```{r Data Import, include = FALSE}
+setwd("/home/clfoucault/Dropbox/##Soil Microbes Internship/Data/R_data")
+
+soil_properties <- read.csv("soil_properties.csv",
+                            dec = ".",
+                            sep = ";",
+                            fileEncoding="UTF-8-BOM",
+                            row.names = 1,
+                            check.names = FALSE)
+soil_properties_f <- soil_properties[-18,]
+a_class <- read.csv("algae/algae_class.csv",
+                   dec = ",",
+                   sep = ";",
+                   fileEncoding="UTF-8-BOM",
+                   row.names = 1)
+a_family <- read.csv("algae/algae_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_genus <- read.csv("algae/algae_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_order <- read.csv("algae/algae_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_phylum <- read.csv("algae/algae_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subclass <- read.csv("algae/algae_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_suborder <- read.csv("algae/algae_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_subphylum <- read.csv("algae/algae_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_class <- read.csv("bacteria/bacteria_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_family <- read.csv("bacteria/bacteria_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_genus <- read.csv("bacteria/bacteria_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_order <- read.csv("bacteria/bacteria_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+b_phylum <- read.csv("bacteria/bacteria_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_class <- read.csv("fungi/fungi_class.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_family <- read.csv("fungi/fungi_family.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_genus <- read.csv("fungi/fungi_genus.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_order <- read.csv("fungi/fungi_order.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_phylum <- read.csv("fungi/fungi_phylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subclass <- read.csv("fungi/fungi_subclass.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subfamily <- read.csv("fungi/fungi_subfamily.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_suborder <- read.csv("fungi/fungi_suborder.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+f_subphylum <- read.csv("fungi/fungi_subphylum.csv",
+                    dec = ",",
+                    sep = ";",
+                    fileEncoding="UTF-8-BOM",
+                    row.names = 1)
+a_genus_bar <- read.csv("algae/algae_genus.csv",
+                        dec = ",",
+                        sep = ";",
+                        fileEncoding="UTF-8-BOM")
+otu_gas <- read.csv("otu_gas.csv",
+                    sep = "\t",
+                    fileEncoding = "UTF-8-BOM")
+
+```
+
+```{r CCA function, include=FALSE}
+graph_cca <- function(data, data_sp, data_gas) {
+  data_log <- data %>% decostand("log")
+  data_cca <- cca(data_log ~ land_use + sand_content + ph + silt_content + cn_ratio + light_treatment, data = data_sp)
+  data_scrs <- scores(data_cca, display = c("sp","wa","lc","bp","cn"))
+  data_sites <- data.frame(data_scrs$sites, t(as.data.frame(strsplit(rownames(data_scrs$sites),"_"))))
+  data_sites <- cbind(data_sites, data_sp[,1])  # to add light treatment
+  colnames(data_sites) <- c("x", "y", "soil", "light_treatment")
+  data_sites <- data_sites %>%  mutate(sample = case_when(soil == "DBZ1"|soil == "DBZ2"|soil == "DBZ3"|soil == "DBZ4"|soil == "DBZ5"|soil == "DBZ6" ~ "DBZ",
+                                                          soil == "LB1"|soil == "LB2"|soil == "LB3"|soil == "LB4"|soil == "LB5"|soil == "LB6" ~ "LB",
+                                                          soil == "LG1"|soil == "LG2"|soil == "LG3"|soil == "LG4"|soil == "LG5"|soil == "LG6" ~ "LG",
+                                                          soil == "TL1"|soil == "TL2"|soil == "TL3"|soil == "TL4"|soil == "TL5"|soil == "TL6" ~ "TL"))
+  light_color <- c("light" = "darkgoldenrod1", "dark" = "orange4")
+  sample_shape <- c("DBZ" = 21, "LB" = 22, "LG" = 23, "TL"= 24)
+  data_plot <- ggplot()
+  data_plot <- data_plot + geom_point(data = data_sites, aes(x, y, fill = light_treatment, shape = sample), size = 5) + 
+    scale_fill_manual(values = light_color) + scale_shape_manual(values = sample_shape) +
+    guides(fill = guide_legend(override.aes=list(shape=21)))  ## SOIL SAMPLE
+  data_biplots <- ordiArrowMul(data_scrs$biplot)
+  data_arrows <- data_scrs$biplot * data_biplots
+  colnames(data_arrows) <- c("x", "y")
+  data_arrows <- as.data.frame(data_arrows)
+  data_plot <- data_plot + geom_segment(data_arrows, mapping = aes(x=0, y=0, xend = x, yend = y),
+                                        arrow = arrow(length = unit(0.2, "cm"))) ## ARROWS
+  data_plot <- data_plot + geom_text_repel(as.data.frame(data_arrows * 1.1), 
+                                           mapping = aes(x, y, label = rownames(data_arrows)), size = 8.5, family = "Garamond", fontface = "bold")## ARROWS LABELS
+  data_otus <- as.data.frame(data_scrs$species)
+  colnames(data_otus) <- c("x", "y")
+  cna <- as.data.frame(colSums(data))
+  colnames(cna) <- c("sum")
+  data_otus <- merge(data_otus, cna, by = "row.names", all.x= F, all.y= F)
+  colnames(data_otus) <- c("phyla", "x", "y", "sum")
+  data_otus <- data_otus %>% mutate(relative_abun = sum / sum(sum) * 100)
+  data_otus <- data_otus %>% filter(phyla %!in% c("Unclassified","Unknown"))
+  data_plot <- data_plot + geom_point(data_otus, mapping = aes(x, y, size = relative_abun), alpha = 1/3) ## OTU POINTS
+  cos_color <- c("uptake" = "green", "emission" = "red")
+  data_plot <- data_plot + theme_bw() + 
+    labs(x = "CCA1", size = "OTU relative abundance (%)", y = "CCA2", shape = "Soil Sample", fill = "Light treatment", col = "COS metabolism") +
+    scale_color_manual(values = cos_color)
+  data_otus_cos <- merge(data_otus, data_gas, by = "phyla", all.x= F, all.y= F)
+  data_otus_cos <- data_otus_cos %>% filter(cos != 'N.A.')
+  data_plot <- data_plot + geom_point(data_otus_cos, mapping = aes(x, y, col = cos, size = relative_abun))
+  data_plot<-data_plot + theme(text=element_text(family="Garamond"),
+                               legend.text = element_text(size = 15),
+                               legend.title = element_text(size = 20)) +
+    geom_text_repel(data_otus_cos, mapping = aes(x,y, label=data_otus_cos$phyla), family = "Garamond", max.iter = 10000, size = 5)
+}
+
+```
+
+All three groups will be studied at the genus level, since it is the lowest shared amongst all of our three groups.
+DBZ, LB, LG and TL are referred as "soils".
+DBZ1, DBZ2, DBZ3, ... are reffered as "samples"
+
+# Dissimilarity analysis 
+
+## Heatmaps 
+### Algae
+
+By generating a heatmap based on algae community composition, it appears that dark LB soils are the most different when compared to the other soils.
+On the other hand, LG soils seem rather similar to other soils (lot of bright yellow and orange). LG algal communities do not seem to differ much between light and dark, while the same observation do not apply for the 3 other soils.  
+
+```{r Algae heatmap, echo=FALSE, out.width="100%"}
+a_genus %>% dist() %>% as.matrix() %>% heatmap(Colv = NA, Rowv = NA)
+```
+
+### Bacteria
+
+The same observations can be drawn from the bacteria communities heatmap.  
+Altough it is interesting to notice that the light treatment do not affect LB bacterial communities as it affected its algal communities.
+
+```{r Bacteria heatmap, echo = FALSE, out.width="100%"}
+b_genus %>% dist() %>% as.matrix() %>% heatmap(Colv = NA, Rowv = NA)
+```
+
+### Fungi
+
+The fungal heatmap most striking feature is that communities appear to be very dissimilar from one another, much more than with the last two groups. 
+LG and TL soils is the most similar couple, while DBZ and LB differ greatly when compared with another group than themself.  
+On the other hand, light do not seem to have a significant effect on communities, except for DBZ and maybe TL, while the soil effect is the very significant. Moreover, it might also be worth noticing that the dark DBZ6 soil is the most dissimilar of all.
+Otherall, it looks like we can assume that fungi communities appear to be more diverse across soils than algae or bacteria communities.
+
+```{r Fungal heatmap, echo=FALSE, out.width="100%"}
+f_genus %>% dist() %>% as.matrix() %>% heatmap(Colv = NA, Rowv = NA)
+```
+
+
+## Clustering trees
+
+### Algae 
+
+A quick look at the algae genus dendrogram confirms the previous observations. 
+Dark LB soils are grouped apart from all the other soils. Most LG soils are placed at the full right of the tree which mean that, on the first hand, LG soils are very similar from each other, no matter the light treatment, and on the other hand, they are the less dissimilar soils from the other 3 soil location when compared to other soils.
+The last observation is that all soils except LG react to light treatment since they appear grouped by either light or dark conditions. This is expected since phototrophs heavily rely on light to thrive. In dark conditions, the algae community would hence be expected to change, possibly to become more facultative-heterotrophs oriented. 
+
+```{r Algae dendrogram, echo=FALSE, out.width="100%"}
+a_genus_dend <- a_genus %>% dist() %>% hclust() %>% as.dendrogram()
+par(mar = c(7, 3, 1, 1)) ; plot(a_genus_dend)
+```
+
+### Bacteria
+
+However, things looks quite different when algaes are exchanged for bacteria. LB soils still appear as the most dissimilar of all soils, but they are not grouped by light treatment anymore. Nonetheless, DBZ and TL soils bacterial communities still show a reaction to light since they're grouped by light treatment. Surprinsingly, LG soils, even if they do not show any specific pattern regarding light, seem to be splitted into two different branches, with the first branch being more similar to all TL soils than to the second LG branch. To understand that, we'll need to look deeper into community composition. Anyway, it seems that bacteria communities show less reaction to light compared to algae communities, which makes sense since bacteria are heterotrophic organisms (cyanobacteria are not included in the bacteria group).
+```{r Bacteria dendrogram, echo = FALSE, out.width="100%"}
+b_genus_dend <- b_genus %>% dist() %>% hclust() %>% as.dendrogram()
+par(mar = c(7, 3, 1, 1)) ; plot(b_genus_dend)
+```
+
+
+### Fungi
+
+The first thing we can notice on the fungal communities dendrogram is that light and dark DBZ soils are placed at the opposite of the plot. This means that placing this soil in the dark induces a huge community shift, which will be particularly interesting to check at the taxonomic level. As expected from the heatmap plot, TL soils are also grouped by light treatment, but are not scattered across the plot like DBZ is.  
+Still as expected from the heatmap, nor LG nor LB are grouped by light treatment.
+
+```{r Fungal dendrogram, echo = FALSE, out.width="100%"}
+f_genus_dend <- f_genus %>% dist() %>% hclust() %>% as.dendrogram()
+par(mar = c(7, 3, 1, 1)) ; plot(f_genus_dend)
+```
+
+
+# Community barplots
+
+## Algae
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/NOBoAHH).
+
+
+LB dark soils clearly stand out from the plot. Their algae communities are all dominated by *Carteria sp.*, in which they account of more than 80% of the algal estimated biomass. It seems likely that they tend to survive better in these acidic soils than other algae genus. Why ? One hypothesis may be their ability to turn heterotrophic (facultatitve heterotrophics). Informations about this genus are very scarce in litterature but it appears that Chlamydomonas, another genus from the same family, includes facultative heterotrophic algae species.
+In light LG soils, there are unfortunately lots of unclassified algae genus. However good amount of *Cylindrocystis sp.* can be found compared to their dark counterpart. 
+
+In DBZ soils (pH = 7), great differences can be seen between light and dark samples. First, *Eunotia sp.* abundance is greater in light than in dark conditions. According to Kociolek et.al, 2015, Eunotia species are epiphytic on a wide range of bryophytes and aquatic vascular plants. Hence, their preference for light may partly be explained by the fact that they benefit from abundance of photosynthetic organism, which is obviously more likely to happen in light conditions. On a second hand, dark DBZ soils shows a huge increase in abundance of both *Nodosilinea* and *Microcoleus* algae genuses. They both belong to the Cyanobacteria phylum, which is known for including a large number of facultative heterotrophic organisms. This could explain why cyanobacterias are so abundant in dark DBZ soils / dark TL soils compared to their light counterparts.
+However, at the genus level, a lot of cyanobacteria remains in the unclassified category. Nonetheless, they do still appear when looking at the scale of the phylum. Moreover, it is worth noting that one of the main feature of Cyanobacterias is their ability to fix atmospheric nitrogen. This capacity could become insanely useful in dark environment where most diazotrophic algae, relying on photosynthesis, would decay.  
+As a summary, in DBZ, light environments are more balanced with several genus from Chlorophyta and Bacillariophyta phylum. In the dark, though, Cyanobacteria takes up to 75% of the community and becomes clearly dominant.
+
+TL soils have more balanced communities in light, since dark communities are dominated by Cyanobacteria and Bryophyta. Sadly, most of these Cyanobacteria comes up as unclassified when zooming in at the genus taxonomic scale. However, a slight increase of the genus *Nostoc sp.* is observed from light to dark.
+
+LG is the least responsive soil to light. It has well balanced communities both in light and dark. ANOSIM targeted on LG soils shows that it is not relevant to group them by light treatment.
+
+```{r echo=FALSE}
+a_genus[13:18,] %>% anosim(soil_properties[13:18,]$light, distance = "bray", permutations = 9999)
+```
+
+## Bacteria
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/1MfGx1Q).
+
+First off, as expected, LB soils are heavily dissimilar from other soils. Light treatment does not have a significant effect on these acidic soils. However, they distinguishe themselves by hosting large quantities of *Acidothermus sp.*. Since this genus is composed of a single member, the species can be identified as *Acidothermus cellullolyticus*. According to Mohagheghi et.al, 1986, this species, discovered in acidic hot springs at Yellowstone National Park (hence the -thermus in the genus denomination), has an optimum pH for growth around 5, and was found in sites with pH values as low as 3,5. This explains why this *A. cellullolyticus* is specific to LeBray, the location with the most acidic soils out of the four. Also, LB soils are hosting other specific bacterial genus, such as *Acidicaldus sp.* and *Acidisphera sp.* that can not be found elsewhere.
+
+In DBZ soils, *Enterobacter sp.* abundance tend to become noticeable for soils placed in the dark. Enterobacter are common facultatively anaerobic bacteria specifically known for being important members of the human gut microbiota. This genus is also abundant in dark TL soils. Moreover, according to Grimont & Grimont (2006), the Enterobacter genus includes several nitrogen fixing OTUs. The previous clustering tree showed that only DBZ and TL were still grouped by light treatment, and it appears that it might be because of this specific bacteria genus that is way more abundant in dark than light.
+
+*Bacillus sp.* is present in both light and dark in TL soils, but is only found in the light in DBZ soils.
+
+LG soils host balanced bacterial communities, but no pattern appears across light treatment, as shown by all the previous figures.
+
+
+## Fungi
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/yvf76x3).
+
+Despite being the most diverse group with more than 2500 different fungal genus across all 4 soils, only twenty of them are accounting for more than 1% of relative abundance in at least one soil replicate.  
+First, it is not clear why light and dark DBZ soils appeared as dissimilar, and this can be explained by the abundance of one specific fungi genus in dark DBZ soils : *Monoblepharella sp.*.
+This genus is part of the chytrids phylum, which is known for including algae predatory OTUs. However, the potential interactions Monoblepharella could have with algae remain to be determined.  
+LB communities do not differ between light and dark, but this soil host very specific fungal genus, such as *Collophora sp*, *Geomyces sp*, *Serpula sp*, *Aspergillus sp*, and even *Capronia sp*. Aspergillus has been observed to thrive in oligotrophic soils, such as LB, as shown by Barakah (1992). Capronia seem also prone to develop on oligotrophic soils, since it includes lichenicolous species (Halici et.al, 2010). The Serpula genus is also known for preferably growing on coniferous wood (Balasundaram, 2018), in which he induces a process known as brown rot. LB being our only pine plantation soil, this might explain why Serpula can only be found there.
+
+Even if at least 50% of each community remains non-identified (Unknow / Unclassified / Environmental), each soils host very different fungal communities, that are interestingly influenced by light treatment. Nonetheless, some genus can be found in all four soils, such as potentiel key OTUs like the Mortierella yeasts.
+
+
+
+# Gas barplots
+## CO2
+
+```{r, echo = FALSE, out.width="100%"}
+dodge <- position_dodge(width=0.9)
+ag_co2plot <- soil_properties %>% 
+  group_by(soil, light_treatment) %>% 
+  summarize(co2 = mean(co2_flux),
+            se = sd(co2_flux / sqrt(length(co2_flux)))) %>% 
+  ggplot(aes(x = soil, y = co2, fill = light_treatment)) + 
+  geom_col(position = "dodge", col = "black") +
+  geom_errorbar(aes(ymin = co2 - se, ymax = co2 + se), 
+                position = dodge,
+                width = 0.2) +
+  theme_ipsum_ps(axis_title_size = 10,
+              plot_title_size = 12,
+              plot_title_face = "bold",
+              plot_title_margin = 0.5,
+              base_size = 10) +
+  scale_fill_manual(values = wes_palette("Chevalier1", n = 2)) +
+  labs(title = "CO2 net flux between soils and light treatment",
+       fill = "Light treatment",
+       y = "CO2 net flux",
+       x = "Soil")
+print(ag_co2plot)
+```
+
+
+Soils are generally sinks for CO2 in the dark, which is a surprising result given that photosynthesis, the main factor for CO2 consumption, can only happen in the light. Moreover, LB is always a source of CO2, even in the dark.
+
+## COS
+
+```{r, echo = FALSE, out.width="100%"}
+dodge <- position_dodge(width=0.9)
+ag_lightplot <- soil_properties %>% 
+  group_by(soil, light_treatment) %>% 
+  summarize(cos = mean(ocs_flux),
+            se = sd(ocs_flux / sqrt(length(ocs_flux)))) %>% 
+  ggplot(aes(x = soil, y = cos, fill = light_treatment)) + 
+           geom_col(position = "dodge", col = "black") +
+  geom_errorbar(aes(ymin = cos - se, ymax = cos + se), 
+                position = dodge,
+                width = 0.2) +
+  theme_ipsum_ps(axis_title_size = 10,
+                 plot_title_size = 12,
+                 plot_title_face = "bold",
+                 plot_title_margin = 0.5,
+              base_size = 10) +
+  scale_fill_manual(values = wes_palette("Chevalier1", n = 2)) +
+  labs(title = "COS net flux between soils and light treatment",
+       fill = "Light treatment",
+       y = "COS net flux",
+       x = "Soil")
+print(ag_lightplot)
+```
+
+All soils have neutral COS flux balances or are sinks for COS. LG, like for CO2, have balanced COS fluxes.  
+TL and LB are the strongest sinks, however they show an interaction between COS flux and light treatment. TL soils can stock more COS in the dark than in the light, while it is the opposite for LB soils.
+
+
+
+# Multivariate analysis. 
+## Canonical correspondance analysis
+
+
+For all CCAs, the following environmental variables were used : 
+- land use  
+- sand content  
+- silt content  
+- pH   
+- C/N ratio  
+- light treatment
+
+
+However, C/N ratio was not constrained successfully since it appeared redundant with other variables.  
+The variable light treatment has been taken into account in each plot, but it is only responsible for a little amount of the variation, as shown by the tiny length of its arrow.
+
+In all CCA, the variable silt content is opposed to sand content, with sand content pointing out to the LB soils, the pine plantation location. As such, the variable land use _ pine plantation is also directed toward this soil location, and pH toward the opposite direction since LB soils have the lowest pH values of all.  
+Otherall, the three CCAs are pretty similar to each other, since the goal of this analysis is to explain communities by environmental variables. Since light treatment has such a tiny effect compared to the soil parameters (pH mainly), all samples are rougly located at the same spots in the multivariate space. LB is always at the extreme right of the plot and the three others are located vertically in the same order at the extreme left. 
+
+Nonetheless, CCAs can still be useful, especially if we can associate functionnal groups to the OTUs plotted across the multivariate space. In this case, I have been associating COS metabolism to different microbes OTUs, according to litterature, and made them appear under certain colours on plots. In total, around a hundred OTUs have been identified as COS consumers or producers across all three groups, which is a low amount when compared to the huge number of OTUs plotted.
+
+A last detail is that OTU relative abundance has been represented as the point size for each OTU. This relative abundance is not specific to a certain soil sample (eg DBZ1) but to all soils location (DBZ + LB + LG + TL). The consequence is that the most abundant OTUs are often placed around the center of the plot, meaning that they are ubiquitous across multiple soils. This makes sense since an OTU present in every soil will have more abundance than endemic OTUs, because its abundance in each soil will add up. 
+
+### Algae 
+#### Classic CCA  
+Plot is too large to be viewed here, [see it here](https://imgur.com/kV2bFF1).
+
+For the algal CCA, no COS metabolism were assigned for algal OTUs since no assignation could be found at the genus level in the litterature. However, at the phylum level, as shown by Meredith et.al (2018), both Chlorophyta and Cyanobacteria members could be capable of producing COS. The following algal CCA is focused on gas emissions, and will be plotted, first at the phylum level, then at the genus level.
+
+#### Gas CCA  
+At the phylum level, [see it here](https://imgur.com/KaUewbr).  
+
+At first glance, it appears that COS and CO2 fluxes gradients are pointing toward opposite directions. Are soils emitting COS sinks for CO2, and soils emitting CO2 sinks for COS ? A positive COS flux means that the soil produces COS, and a negative flux means that he is a sink. It makes sense since gas barplots showed that some soils could be at the same time strong sinks for COS but strong emitters of CO2 (eg LB and TL in the light).  
+Both suspected phylum for COS production do not seem to have their abundance correlating with COS fluxes, since they are positionned at the center of the plot.
+However, Marchantiophyta has interestingly been plotted at the peak of the COS flux gradient arrow. Marchantiophyta are a division of non vascular plants commonly referred to as liverworts. But this does not mean that they are COS emitters, in fact, Gimeno et.al (2017) have shown that liverworts were able to consume atmospheric COS. Their position on the plot might rather mean that they are associated with COS emmiters, and that their ability to consume COS is lesser than their partners ability to produce COS, resulting in a positive flux. 
+
+Bryophyta, known for being able to consume COS just like liverworts, are placed at the opposite of the COS gradient, which makes sense.
+
+Finally, most algae phylum seem to be associated with CO2 uptake rather than CO2 emission.
+
+
+At the genus level, [see it here](https://imgur.com/1ISzQd3).  
+
+When looking at the genus level, it appears that multiple algae genus are correlated with COS uptake of COS emission.  
+First, *Sphagnus sp.* is sitting at the right of the plot, correlating with COS uptake. This makes sense since Bryophytes are expected to consume COS. The rest of the OTUs at the extreme right are green algae. These OTUs are plotted around LB soil samples. As seen previously, this soil is a sink for COS both in light and dark conditions.  
+Nonetheless, it is clear that the most commun OTUs, symbolised by large points, do not especially correlate correlate nor with COS uptake nor with COS emission. This means that correlations observed on this plot are all linked to OTUs with small abundance, and that it will be necessary to learn and check about specific interactions or functions.
+
+
+### Bacteria
+#### Classic CCA
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/vB237rN). 
+
+Bacteria from the Mycobacterium genus have been described in the litterature (Kato et.al, 2008, Whelan et.al, 2018) as strong COS consumers. They appear on this plot to be the closer COS consumer OTU to LB soil.  
+I need to find informations about their functions.
+
+#### Gas CCA
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/MQhKyeY). 
+
+I need to work on this plot, there are too many informations on it.
+
+### Fungi 
+#### Classic CCA
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/KLNvqPT). 
+
+Many fungal genus classified as COS consumers are close to LB soils in the multivariate space, such as *Pholiota sp.*. Moreover, *Mycena sp.* is the closest identified COS consumer from TL soils, which where previously identified as the strongest COS sinks.  
+I need to find informations about their functions.
+
+#### Gas CCA
+
+Plot is too large to be viewed here, [see it here](https://imgur.com/k51yQ07). 
+
+The Mortierella genus do not seem to correlate with COS emission, as it could have been expected, nor with COS consumption.  
+However, many genus classified as COS consumers are placed at the opposite of the COS gradient, which is excellent. 
+
+
+
+# What next
+## Clean functional groups definition 
+
+Even with a hundred OTUs assignated according to their COS metabolism, there are still a lot of OTUs that seem to have a strong link with COS fluxes but that lacks any assignation. Moreover, some of the OTUs such as Mortierella do not seem to be responsible for the COS balance in our soils.
+
+So, looking through more OTUs to keep classifying them will be great. It would also be nice to see lichen-like interactions since they are known for being COS consumers (Brown et.al, 1988). This might highlight some OTUs that could not be classified otherwise.
+
+## Some more analysis
+
+It will be nice to look at potential correlations between certain OTUs, so that we can better understand the community shifts between light and dark and also the gas balance shifts. Moreover, this analysis might highlight the potential lichen-like interaction that were mentionned above.
+
+True correlation analysis between OTUs and gas fluxes will be necessary as well. The gas CCAs are sort of a backdoor to see what will could obtain with a proper analysis, but they cannot substitute to it.
+
+## So that we can understand gas fluxes
+
+I am especially curious to understand the cause of the interaction between light and COS fluxes. It has previously been shown that community shifts induced by light or dark were relative to each soil, and it will only be possible to understand why by identifying the right species and their interactions.
+

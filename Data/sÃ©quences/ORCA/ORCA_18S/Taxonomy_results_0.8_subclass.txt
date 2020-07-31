@@ -1,0 +1,30 @@
+Taxonomy_highest	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Ascomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Basidiomycota	Unknown	Unclassified	Environmental	
+Taxonomy_intermediate	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina	Pezizomycotina			Pucciniomycotina	Pucciniomycotina	Pucciniomycotina	Pucciniomycotina	Pucciniomycotina
+Taxonomy_intermediate	Dothideomycetes	Dothideomycetes	Eurotiomycetes	Eurotiomycetes	Eurotiomycetes	Lecanoromycetes	Lecanoromycetes	Lecanoromycetes	Sordariomycetes	Sordariomycetes	Sordariomycetes	Agaricomycetes	Agaricomycetes					
+Taxonomy_subclass	Dothideomycetidae	Pleosporomycetidae	Chaetothyriomycetidae	Eurotiomycetidae	Mycocaliciomycetidae	Acarosporomycetidae	Lecanoromycetidae	Ostropomycetidae	Hypocreomycetidae	Sordariomycetidae	Xylariomycetidae	Agaricomycetidae	Phallomycetidae	Classiculomycetes	Cystobasidiomycetes	Microbotryomycetes	Mixiomycetes	Pucciniomycetes	Unknown	Unclassified	Environmental	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	106	283	275	204	0	0	10	1	1067	906	33	61	0	0	2	10	0	0	289	3442	811	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	89	294	194	122	0	0	7	0	1074	664	26	180	0	0	2	11	0	1	311	3536	989	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	127	330	328	185	0	0	7	3	1077	819	26	92	0	0	2	11	0	2	317	3269	905	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	66	445	203	43	0	0	14	2	768	411	53	54	0	0	7	11	0	1	409	4332	681	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	39	294	107	57	0	0	13	0	1065	311	14	94	0	0	0	4	0	0	367	4361	774	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_DBZ6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	34	179	152	56	0	0	4	1	567	310	9	34	0	0	1	11	0	0	224	5111	807	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_G4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	77	375	95	107	0	0	0	1	428	133	6	853	0	0	6	21	0	0	218	4445	735	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	24	159	370	354	0	0	13	9	83	77	1	343	1	0	2	265	0	1	188	4564	1046	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	9	92	290	304	0	0	7	5	63	81	0	237	1	0	2	273	0	0	336	4435	1365	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	14	99	290	487	0	0	12	5	75	85	1	416	0	0	2	238	0	0	228	4448	1100	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	21	113	286	400	0	0	13	8	77	73	4	328	0	0	3	269	0	1	312	4547	1045	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	11	75	249	309	0	0	17	0	75	80	1	170	3	0	2	288	0	0	492	4784	944	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LB6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	16	117	266	414	0	0	27	3	88	101	1	272	0	0	1	205	0	1	385	4843	760	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	114	454	305	39	0	0	10	0	632	207	9	117	0	0	1	39	0	1	531	3492	1549	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	77	327	127	20	0	0	7	0	550	98	3	134	0	0	1	24	0	0	513	4275	1344	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	68	493	223	23	0	0	12	0	652	151	5	151	0	0	0	24	0	0	426	3660	1612	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	72	365	168	19	0	0	5	0	551	147	3	235	0	0	0	40	0	1	936	3527	1431	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	94	398	160	17	0	0	3	0	568	118	5	300	0	0	2	23	0	2	466	4278	1066	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_LG6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	62	302	137	15	0	0	3	0	454	122	3	571	0	0	1	34	0	2	544	3792	1458	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL1_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	38	362	88	31	0	0	2	1	410	105	148	264	0	0	2	12	0	26	1024	2997	1990	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL2_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	19	274	81	19	0	0	1	1	351	99	163	206	3	0	0	13	0	22	797	3459	1992	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL3_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	26	231	83	13	0	0	0	0	301	117	136	252	0	0	3	13	0	33	1101	3269	1922	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL4_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	21	764	25	4	0	0	3	1	216	57	72	180	0	0	2	3	0	790	875	3195	1292	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL5_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	21	630	19	10	0	0	3	0	187	76	61	156	0	0	9	4	0	1067	913	3150	1194	
+Taxo_SILVA_Rdm_Derep_Clean_Hunt_Derep_Hpreprocess_ORCA_TL6_18S_ORCA_18S_S1_L001_R1_001_prinseq_good.extendedFrags.fasta	30	405	47	5	0	0	8	0	177	60	67	249	0	0	5	4	0	831	1630	2776	1206	
+

@@ -1,0 +1,25 @@
+sample;light_treatment;land_use;ph;sand_content;silt_content;clay_content;cn_ratio;soil;sample_light;bulk_density;volumetric_water;ocs_flux;co2_flux;total_biomass;chamber
+DBZ1;light;cropland;6.77;822;57;91;13.9;DBZ;DBZ light;1.24;0.28;-1.2985;-0.90325;22127.8;1
+DBZ2;light;cropland;6.98;822;57;91;13.9;DBZ;DBZ light;1.41;0.32;-1.381625;-0.9065;23074.1;2
+DBZ3;light;cropland;6.81;822;57;91;13.9;DBZ;DBZ light;1.24;0.28;-0.661625;-0.18625;20608.4;3
+DBZ4;dark;cropland;7.05;822;57;91;13.9;DBZ;DBZ dark;1.3;0.3;-0.7262500000000001;0.136;36051.9;4
+DBZ5;dark;cropland;7.03;822;57;91;13.9;DBZ;DBZ dark;1.42;0.31;-1.165;0.14925;49038.2;5
+DBZ6;dark;cropland;7.07;822;57;91;13.9;DBZ;DBZ dark;1.28;0.27;-0.475;0.14525;31299.7;6
+LB1;light;pine plantation;4.6;947;26;27;26;LB;LB light;0.75;0.32;-2.7395;0.40725;45901;2
+LB2;light;pine plantation;4.57;947;26;27;26;LB;LB light;0.77;0.28;-1.69175;0.38775;36417.8;3
+LB3;light;pine plantation;4.56;947;26;27;26;LB;LB light;0.79;0.26;-1.62825;0.4245;33493.5;4
+LB4;dark;pine plantation;4.59;947;26;27;26;LB;LB dark ;0.79;0.27;-15.417;0.16949999999999998;28096.4;5
+LB5;dark;pine plantation;4.5;947;26;27;26;LB;LB dark ;0.82;0.26;-3.109;0.8395;26097.6;6
+LB6;dark;pine plantation;4.48;947;26;27;26;LB;LB dark ;0.79;0.26;-1.1925;0.6605;37234.9;7
+LG1;light;cropland;6.14;184;647;169;10.4;LG;LG light;1.04;0.26;-0.8335;-0.40149999999999997;33514.3;1
+LG2;light;cropland;6.39;184;647;169;10.4;LG;LG light;1.03;0.25;-0.87325;0.0037500000000000016;79243;5
+LG3;light;cropland;6.14;184;647;169;10.4;LG;LG light;1.05;0.25;-0.45125;-0.25325;29323.2;2
+LG4;dark;cropland;6.35;184;647;169;10.4;LG;LG dark;1.05;0.26;-1.08075;0.64425;40865.3;6
+LG5;dark;cropland;6.16;184;647;169;10.4;LG;LG dark;1.05;0.26;-2.2472499999999997;0.4065;41294.3;3
+LG6;dark;cropland;6.45;184;647;169;10.4;LG;LG dark;1.01;0.24;-0.384;0.44675;51746.8;7
+TL1;light;cropland;8.09;167;523;310;10.4;TL;TL light;0.97;0.31;-3.45175;-0.48625;28368.4;2
+TL2;light;cropland;8.09;167;523;310;10.4;TL;TL light;0.99;0.31;-3.37775;-0.629875;55340.4;4
+TL3;light;cropland;8.21;167;523;310;10.4;TL;TL light;0.92;0.28;-2.877;-0.30737499999999995;23133.8;6
+TL4;dark;cropland;8.23;167;523;310;10.4;TL;TL dark;0.94;0.27;-0.9155;1.02375;40888.4;7
+TL5;dark;cropland;8.01;167;523;310;10.4;TL;TL dark;0.91;0.27;-1.01725;0.97;31510;5
+TL6;dark;cropland;7.97;167;523;310;10.4;TL;TL dark;0.96;0.29;-1.24375;1.52975;52858.7;3

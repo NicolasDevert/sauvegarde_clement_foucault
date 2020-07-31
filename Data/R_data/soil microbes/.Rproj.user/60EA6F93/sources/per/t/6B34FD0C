@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580978127399.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1095056657",
+    "id" : "6B34FD0C",
+    "lastKnownWriteTime" : 1581437416,
+    "last_content_update" : 1581437416223,
+    "path" : "~/Dropbox/##Soil Microbes Internship/Data/R_data/soil microbes/soil microbes.R",
+    "project_path" : "soil microbes.R",
+    "properties" : {
+        "cursorPosition" : "284,23",
+        "scrollLine" : "257"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

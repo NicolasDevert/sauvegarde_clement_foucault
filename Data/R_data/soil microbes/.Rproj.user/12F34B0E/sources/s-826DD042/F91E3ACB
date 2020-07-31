@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584619912483.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F91E3ACB",
+    "lastKnownWriteTime" : 8319104478871053602,
+    "last_content_update" : 1584619912483,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "5B01ED8A",
+        "caption" : "otu.table",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=otu.table&cache_key=5B01ED8A",
+        "displayedObservations" : 24,
+        "environment" : "",
+        "expression" : "otu.table",
+        "object" : "otu.table",
+        "preview" : 0,
+        "totalObservations" : 24,
+        "variables" : 49
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

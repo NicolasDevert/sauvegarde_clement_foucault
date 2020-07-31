@@ -1,0 +1,2489 @@
+##############################################   
+#################    Library  ################
+##############################################  
+
+#### Library ####
+
+library(lattice)          
+library(nlme)
+library(stats)
+library(RODBC)
+library(gplots)
+library(utils)
+library(multcompView)
+library(multcomp)
+library(ade4)
+library(FactoMineR)
+library(MASS)
+library(lme4)
+library(aod)
+library(sandwich)
+library(lmtest)
+library(geepack)
+library(spdep)
+library(nls2)
+library(car)                
+library(vegan)
+library(ecodist)
+library(FD)
+library(lavaan)
+library(betapart)
+library(pvclust)
+library(LMERConvenienceFunctions)
+
+##############################################   
+############    NMDS ALL ISLANDS  ############
+##############################################  
+
+#### NMDS ALL ISLANDS   ####
+
+setwd("C:/Users/nfanin/Dropbox/Sweden/Statistic")     
+GroupRelFG = read.table("GroupRelFG.txt", header=T, sep="\t")
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+GroupRelFG= na.omit (GroupRelFG)
+
+head(FungiRelFG) ; names(FungiRelFG)
+str(FungiRelFG)      
+names(FungiRelFG)
+str(GroupRelFG)    
+
+FunFGNMDS= FungiRelFG [9:2982] ########## TOTAL 
+
+maxab <- apply(FunFGNMDS, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGNMDS)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGNMDS <- FunFGNMDS[, -which(names(FunFGNMDS) %in% n1)]
+dim(FunFGNMDS)
+str(FunFGNMDS)      
+
+
+par(mfrow=c(1,1))
+FuniFGNMDS <- vegdist(FunFGNMDS)
+ord <- decorana(FuniFGNMDS)
+ord <- metaMDS(FuniFGNMDS)
+
+plot(ord, disp="sites", type="n")          ########## TREATMENT 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FungiRelFG$Plot , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FungiRelFG$Plot , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FungiRelFG$Plot , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n")  ########## SHRUB 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FungiRelFG$shrubrem , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FungiRelFG$shrubrem  , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FungiRelFG$shrubrem  , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n") ########## TREE 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FungiRelFG$treerem  , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FungiRelFG$treerem  , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FungiRelFG$treerem  , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n") ########## MOSS 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FungiRelFG$mossrem, col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FungiRelFG$mossrem, col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FungiRelFG$mossrem , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n") ########## SIZE 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FungiRelFG$Size, col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FungiRelFG$Size, col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FungiRelFG$Size , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+ord.fit <- envfit(ord ~ ERI*	ROOT*	ECM*	SAP*	LICHEN*	PATHO*	MOULD*	UNK, data=GroupRelFG  , perm=999)   #fits vectors of continuous variables and centroids of levels of class variables
+plot(ord.fit)
+
+#####################################################   
+#############  PERMANOVA ALL ISLANDS  ###############
+#####################################################  
+
+#### PERMANOVA ALL ISLANDS  #### 
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+FunFGperm=FungiRelFG[9:2982] 
+
+maxab <- apply(FunFGperm, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGperm)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than 0.01% as their maximum relative abundance
+FunFGperm<- FunFGperm[, -which(names(FunFGperm) %in% n1)]
+dim(FunFGperm)
+
+FunFG.bc = bcdist(FunFGperm , rmzero=FALSE)     
+Island=FungiRelFG[,2] 
+Size =FungiRelFG[,4] 
+treeremov =FungiRelFG[,5] 
+mossremov  =FungiRelFG[,6] 
+schrubremov =FungiRelFG[,7] 
+permfinal<-adonis(FunFG.bc~ treeremov*mossremov*schrubremov*Size +Island, permutations=999, strata = Island)
+# permfinal<-adonis(FunFG.bc~ treeremov*mossremov*schrubremov*Size ,  permutations=999, strata = Island)
+permfinal
+
+# Count data
+FungiCountFG = read.table("CountFGnoNA.txt", header=T, sep="\t")
+FungiCountFG = na.omit (FungiCountFG)
+FunFGperm=FungiCountFG[9:2982] 
+
+maxab <- apply(FunFGperm, 2, max) #
+head(maxab)
+dim(FunFGperm)
+n1 <- names(which(maxab < 1)) 
+FunFGperm <- FunFGperm[, -which(names(FunFGperm) %in% n1)]
+dim(FunFGperm)
+
+FunFG.bc = vegdist(FunFGperm , "horn")     
+Island=FungiCountFG[,2] 
+Size =FungiCountFG[,4] 
+treeremov =FungiCountFG[,5] 
+mossremov  =FungiCountFG[,6] 
+schrubremov =FungiCountFG[,7] 
+permfinal<-adonis(FunFG.bc~ treeremov*mossremov*schrubremov*Size +Island, permutations=999, strata = Island)
+# permfinal<-adonis(FunFG.bc~ treeremov*mossremov*schrubremov*Size ,  permutations=999, strata = Island)
+permfinal
+
+
+
+#####################################################   
+################   NMDS SMALL ISLAND  ############### 
+##################################################### 
+
+#### NMDS SMALL ISLAND ####
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+GroupRelFG = read.table("GroupRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+GroupRelFG= na.omit (GroupRelFG)
+
+FunFGNMDSsmall = subset (FungiRelFG, Size == "small") ########## SMALL ONLY 
+FunFGNMDSsmall1=FunFGNMDSsmall[9:2982]  ########## SMALL ONLY 
+
+maxab <- apply(FunFGNMDSsmall1, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGNMDSsmall1)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGNMDSsmall1 <- FunFGNMDSsmall1[, -which(names(FunFGNMDSsmall1) %in% n1)]
+dim(FunFGNMDSsmall1)
+
+FuniFGNMDSsmall <- vegdist(FunFGNMDSsmall1)
+ord <- decorana(FuniFGNMDSsmall)
+ord <- metaMDS(FuniFGNMDSsmall)
+plot(ord, type = "n")
+
+plot(ord, disp="sites", type="n")          ########## TREATMENT 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSsmall$Plot , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSsmall$Plot , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSsmall$Plot , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n")  ########## SHRUB 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSsmall$shrubrem , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSsmall$shrubrem  , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSsmall$shrubrem  , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+GroupRelsmall = subset (GroupRelFG, Size == "small") ########## SMALL ONLY
+
+ord.fit <- envfit(ord ~ ERI*	ROOT*	ECM*	SAP*PATHO*	MOULD	, data=GroupRelsmall  , perm=999)   #fits vectors of continuous variables and centroids of levels of class variables
+plot(ord.fit)
+
+#####################################################   
+###############  PERMANOVA SMALL ISLAND  ############
+#####################################################  
+
+#### PERMANOVA SMALL ISLAND ####
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+FunFGsmall = subset (FungiRelFG, Size == "small") ########## SMALL ONLY 
+FunFGsmall.Perm = FunFGsmall [9:2982]
+
+maxab <- apply(FunFGsmall.Perm, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGsmall.Perm)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGsmall.Perm<- FunFGsmall.Perm[, -which(names(FunFGsmall.Perm) %in% n1)]
+dim(FunFGsmall.Perm)
+
+FunFGsmall.bc = bcdist(FunFGsmall.Perm  , rmzero=FALSE)     
+Islandsmall=FunFGsmall[,2] 
+treeremovsmall =FunFGsmall[,5] 
+mossremovsmall  =FunFGsmall[,6] 
+schrubremovsmall =FunFGsmall[,7] 
+permfinal2<-adonis(FunFGsmall.bc~ treeremovsmall*mossremovsmall*schrubremovsmall+ Islandsmall,   permutations=999, strata = Islandsmall)
+# permfinal2<-adonis(FunFGsmall.bc~ treeremovsmall*mossremovsmall*schrubremovsmall,  permutations=999, strata = Islandsmall)
+permfinal2
+
+#####################################################   
+##############    NMDS MEDIUM ISLAND  ############### 
+##################################################### 
+
+#### NMDS MEDIUM ISLAND #### 
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+GroupRelFG = read.table("GroupRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+GroupRelFG= na.omit (GroupRelFG)
+
+FunFGNMDSmedium = subset (FungiRelFG, Size == "medium") ########## MEDIUM ONLY 
+FunFGNMDSmedium1=FunFGNMDSmedium[9:2982]  ########## MEDIUM ONLY 
+
+maxab <- apply(FunFGNMDSmedium1, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGNMDSmedium1)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGNMDSmedium1<- FunFGNMDSmedium1[, -which(names(FunFGNMDSmedium1) %in% n1)]
+dim(FunFGNMDSmedium1)
+
+FuniFGNMDSmedium <- vegdist(FunFGNMDSmedium1)
+ord <- decorana(FuniFGNMDSmedium)
+ord <- metaMDS(FuniFGNMDSmedium)
+plot(ord, type = "n")
+
+plot(ord, disp="sites", type="n")          ########## TREATMENT 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSmedium$Plot , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSmedium$Plot , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSmedium$Plot , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n")  ########## SHRUB 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSmedium$shrubrem  , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSmedium$shrubrem  , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSmedium$shrubrem  , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+GroupRelmedium = subset (GroupRelFG, Size == "medium") ########## MEDIUM ONLY 
+
+ord.fit <- envfit(ord ~ ERI*	ROOT*	ECM*	SAP*	PATHO*	MOULD, data=GroupRelmedium  , perm=999)   #fits vectors of continuous variables and centroids of levels of class variables
+plot(ord.fit)
+
+#####################################################   
+###############  PERMANOVA MEDIUM ISLAND  ###########
+#####################################################  
+
+#### PERMANOVA MEDIUM ISLAND ####
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+FunFGmedium = subset (FungiRelFG, Size == "medium") ########## MEDIUM ONLY 
+FunFGmedium.Perm = FunFGmedium [9:2982]
+
+maxab <- apply(FunFGmedium.Perm, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGmedium.Perm)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGmedium.Perm<- FunFGmedium.Perm[, -which(names(FunFGmedium.Perm) %in% n1)]
+dim(FunFGmedium.Perm)
+
+FunFGmedium.bc = bcdist(FunFGmedium.Perm  , rmzero=FALSE)     
+Islandmedium=FunFGmedium[,2] 
+treeremovmedium =FunFGmedium[,5] 
+mossremovmedium  =FunFGmedium[,6] 
+schrubremovmedium =FunFGmedium[,7] 
+permfinal3<-adonis(FunFGmedium.bc~ treeremovmedium*mossremovmedium*schrubremovmedium+Islandmedium,  permutations=999, strata = Islandmedium)
+# permfinal3<-adonis(FunFGmedium.bc~ treeremovmedium*mossremovmedium*schrubremovmedium,  permutations=999, strata = Islandmedium)
+permfinal3
+
+#####################################################   
+###############   NMDS LARGE ISLAND  ################ 
+##################################################### 
+
+#### NMDS LARGE ISLAND #### 
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+GroupRelFG = read.table("GroupRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+GroupRelFG= na.omit (GroupRelFG)
+FunFGNMDSlarge = subset (FungiRelFG, Size == "large") ########## LARGE ONLY 
+FunFGNMDSlarge1=FunFGNMDSlarge[9:2982]  ########## LARGE ONLY 
+
+maxab <- apply(FunFGNMDSlarge1, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGNMDSlarge1)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGNMDSlarge1<- FunFGNMDSlarge1[, -which(names(FunFGNMDSlarge1) %in% n1)]
+dim(FunFGNMDSlarge1)
+
+FuniFGNMDSlarge <- vegdist(FunFGNMDSlarge1)
+ord <- decorana(FuniFGNMDSlarge)
+ord <- metaMDS(FuniFGNMDSlarge)
+
+plot(ord, disp="sites", type="n")          ########## TREATMENT 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSlarge$Plot ,col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSlarge$Plot , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSlarge$Plot , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+plot(ord, disp="sites", type="n")  ########## SHRUB 
+points(ord, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")                                                                                
+ordihull(ord, FunFGNMDSlarge$shrubrem  , col = "blue") #ordihull adds convex hulls
+ordiellipse(ord, FunFGNMDSlarge$shrubrem  , col = "green",lwd=1) #ordiellipse adds ellipses of standard deviation
+ordispider(ord, FunFGNMDSlarge$shrubrem  , col = "red", label = TRUE)  #ordispider combines items to their centroid
+
+GroupRellarge = subset (GroupRelFG, Size == "large") ########## LARGE ONLY 
+
+ord.fit <- envfit(ord ~ ERI*	ROOT*	ECM*	SAP*	PATHO*	MOULD	, data=GroupRellarge   , perm=999)   #fits vectors of continuous variables and centroids of levels of class variables
+plot(ord.fit)
+
+#####################################################   
+###############  PERMANOVA LARGE ISLAND  ############
+#####################################################  
+
+#### PERMANOVA LARGE ISLAND ####
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t")
+FungiRelFG = na.omit (FungiRelFG)
+FunFGlarge= subset (FungiRelFG, Size == "large") ########## LARGE ONLY 
+FunFGlarge.Perm = FunFGlarge [9:2982]
+
+maxab <- apply(FunFGlarge.Perm, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGlarge.Perm)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+FunFGlarge.Perm<- FunFGlarge.Perm[, -which(names(FunFGlarge.Perm) %in% n1)]
+dim(FunFGlarge.Perm)
+
+FunFGlarge.bc = bcdist(FunFGlarge.Perm  , rmzero=FALSE)     
+Islandlarge = FunFGlarge[,2] 
+treeremovlarge =FunFGlarge[,5] 
+mossremovlarge  =FunFGlarge[,6] 
+schrubremovlarge =FunFGlarge[,7] 
+permfinal4<-adonis(FunFGlarge.bc~ treeremovlarge*mossremovlarge*schrubremovlarge+Islandlarge, permutations=999, strata = Islandlarge)
+# permfinal4<-adonis(FunFGlarge.bc~ treeremovlarge*mossremovlarge*schrubremovlarge,  permutations=999, strata = Islandlarge)
+permfinal4
+
+#################################################  
+##############    GROUP Fungi Model #############  
+################################################# 
+
+#### ERICOID ####
+GroupRelFG = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+GroupRelFG= na.omit (GroupRelFG)
+
+modelfinal1 = lme (ERI ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal1)
+
+modelfinal1 = lmer (ERI ~Size+treerem+mossrem+schrubrem + (1|Island), data = GroupRelFG)
+pamer.fnc (modelfinal1)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$ERI)
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,GroupRelFG$ERI)
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$ERI) 
+
+par(mfrow=c(2,2))
+boxplot (ERI ~ Size,   data = GroupRelFG)
+boxplot (ERI ~ treerem*Size,  data = GroupRelFG)
+boxplot (ERI ~ mossrem*Size,data = GroupRelFG)
+boxplot (ERI ~ schrubrem*Size,   data = GroupRelFG)
+
+par(mfrow=c(1,1))
+boxplot (ERI ~ treerem*Size,  data = GroupRelFG)
+
+par(mfrow=c(1,1))
+boxplot (ERI ~ Plot,  data = GroupRelFG)
+
+modelfinal269 = lme (ERI ~Size*treerem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal269)
+
+symbols( GroupRelFG$ERI,  GroupRelFG$ECM, circles= GroupRelFG$ERI)
+
+
+
+#### ERICOID PERMANOVA ####
+ERIFG = read.table("ERIFG.txt", header=T, sep="\t")
+ERIFG= na.omit (ERIFG)
+str(ERIFG)
+
+ERIFG.Perm = ERIFG [9:39]
+
+ERIFG.bc = bcdist(ERIFG.Perm , rmzero=FALSE)     
+Island = ERIFG[,2] 
+Size = ERIFG[,4] 
+treeremov =ERIFG[,5] 
+mossremov  =ERIFG[,6] 
+schrubremov =ERIFG[,7] 
+permfinal14<-adonis(ERIFG.bc~ Size*treeremov*mossremov*schrubremov+Island, data=ERIFG.Perm  , permutations=999, strata = Island)
+#permfinal14<-adonis(ERIFG.bc~ Size*treeremov*mossremov*schrubremov, data=ERIFG.Perm  , permutations=999, strata = Island)
+permfinal14
+
+#### SAPROTROPH ####
+
+modelfinal2 = lme (SAP ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal2)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$SAP)
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossremo,GroupRelFG$SAP)
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$SAP) 
+
+par(mfrow=c(2,2))
+boxplot (SAP ~ Size,   data = GroupRelFG)
+boxplot (SAP ~ treerem*Size,  data = GroupRelFG)
+boxplot (SAP ~ mossrem*Size,  data = GroupRelFG)
+boxplot (SAP ~ schrubrem*Size,   data = GroupRelFG)
+
+#### SAPROTROPH PERMANOVA ####
+SAPFG = read.table("SAPFG.txt", header=T, sep="\t")
+SAPFG= na.omit (SAPFG)
+str(SAPFG)
+
+SAPFG.Perm = SAPFG [9:169]
+
+SAPFG.bc = bcdist(SAPFG.Perm , rmzero=FALSE)     
+Island = SAPFG[,2] 
+Size = SAPFG[,4] 
+treeremov =SAPFG[,5] 
+mossremov  =SAPFG[,6] 
+schrubremov =SAPFG[,7] 
+permfinal15<-adonis(SAPFG.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal15<-adonis(SAPFG.bc~ Size*treeremov*mossremov*schrubremov,  permutations=999, strata = Island)
+permfinal15
+
+#### ECM ####
+
+modelfinal3 = lme (ECM ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal3)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$ECM )
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,GroupRelFG$ECM )
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$ECM ) 
+
+par(mfrow=c(2,2))
+boxplot (ECM ~ Size,  data = GroupRelFG)
+boxplot (ECM  ~ treerem*Size,  data = GroupRelFG)
+boxplot (ECM  ~ mossrem*Size, data = GroupRelFG)
+boxplot (ECM  ~ schrubrem*Size,   data = GroupRelFG)
+
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs=c(.02, .98), na.rm = na.rm, ...)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  y
+}
+y <- remove_outliers(GroupRelFG$ECM)
+boxplot (y ~ GroupRelFG$Size,  data = GroupRelFG)
+boxplot (y  ~ GroupRelFG$treerem*Size,  data = GroupRelFG)
+boxplot (y  ~ GroupRelFG$mossrem*Size,  data = GroupRelFG)
+boxplot (y  ~ GroupRelFG$schrubrem*Size, data = GroupRelFG)
+
+modelfinal158 = lme (ERI ~Size*treerem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal158)
+
+par(mfrow=c(1,1))
+boxplot (y  ~ GroupRelFG$schrubrem*Size,  data = GroupRelFG)
+
+
+ECMsmall =subset (GroupRelFG, Size == "small") ########## small ONLY ##########
+ECMmedium =subset (GroupRelFG, Size == "medium") ########## medium ONLY ##########
+ECMlarge =subset (GroupRelFG, Size == "large") ########## largeONLY ##########
+
+modelfinal1 = lme (ECM ~ schrubrem, random = ~1|Island, data = ECMsmall, na=na.omit)
+anova(modelfinal1)
+
+
+#### ECM PERMANOVA ####
+ECMFG = read.table("ECMFG.txt", header=T, sep="\t")
+ECMFG= na.omit (ECMFG)
+str(ECMFG)
+
+ECMFG.Perm = ECMFG [9:56]
+
+ECMFG.bc = bcdist(ECMFG.Perm , rmzero=FALSE)     
+Island = ECMFG[,2] 
+Size = ECMFG[,4] 
+treeremov =ECMFG[,5] 
+mossremov  =ECMFG[,6] 
+schrubremov =ECMFG[,7] 
+permfinal16<-adonis(ECMFG.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal16<-adonis(ECMFG.bc~ Size*treeremov*mossremov*schrubremov,  permutations=999, strata = Island)
+permfinal16
+
+#### ROOTS ####
+
+modelfinal4 = lme (ROOT ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal4)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$ROOT )
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,GroupRelFG$ROOT )
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$ROOT ) 
+
+par(mfrow=c(2,2))
+boxplot (ROOT  ~ Size, notch=TRUE,  data = GroupRelFG)
+boxplot (ROOT  ~ treerem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (ROOT  ~ mossrem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (ROOT  ~ schrubrem*Size, notch=TRUE,  data = GroupRelFG)
+
+#### ROOTS PERMANOVA ####
+ROOTFG = read.table("ROOTFG.txt", header=T, sep="\t")
+ROOTFG= na.omit (ROOTFG)
+str(ROOTFG)
+
+ROOTFG.Perm = ROOTFG [9:39]
+
+ROOTFG.bc = bcdist(ROOTFG.Perm , rmzero=FALSE)     
+Island = ROOTFG[,2] 
+Size = ROOTFG[,4] 
+treeremov =ROOTFG[,5] 
+mossremov  =ROOTFG[,6] 
+schrubremov =ROOTFG[,7] 
+permfinal17<-adonis(ROOTFG.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal17<-adonis(ROOTFG.bc~ Size*treeremov*mossremov*schrubremov,  permutations=999, strata = Island)
+permfinal17
+
+#### MOULD ####
+
+modelfinal5 = lme (MOULD ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal5)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$MOULD )
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,GroupRelFG$MOULD )
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$MOULD ) 
+
+par(mfrow=c(2,2))
+boxplot (MOULD ~ Size, notch=TRUE,  data = GroupRelFG)
+boxplot (MOULD  ~ treerem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (MOULD  ~ mossrem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (MOULD  ~ schrubrem*Size, notch=TRUE,  data = GroupRelFG)
+
+#### MOULD PERMANOVA ####
+MOULDFG = read.table("MOULDFG.txt", header=T, sep="\t")
+MOULDFG= na.omit (MOULDFG)
+str(MOULDFG)
+
+MOULDFG.Perm = MOULDFG [9:39]
+
+MOULDFG.bc = bcdist(MOULDFG.Perm , rmzero=FALSE)     
+Island = MOULDFG[,2] 
+Size = MOULDFG[,4] 
+treeremov =MOULDFG[,5] 
+mossremov  =MOULDFG[,6] 
+schrubremov =MOULDFG[,7] 
+permfinal18<-adonis(MOULDFG.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal18<-adonis(MOULDFG.bc~ Size*treeremov*mossremov*schrubremov, permutations=999, strata = Island)
+permfinal18
+
+#### PATHO ####
+
+modelfinal5 = lme (PATHO ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal5)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,GroupRelFG$PATHO )
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,GroupRelFG$PATHO )
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,GroupRelFG$PATHO ) 
+
+par(mfrow=c(2,2))
+boxplot (PATHO ~ Size, notch=TRUE,  data = GroupRelFG)
+boxplot (PATHO  ~ treerem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (PATHO ~ mossrem*Size, notch=TRUE, data = GroupRelFG)
+boxplot (PATHO  ~ schrubrem*Size, notch=TRUE,  data = GroupRelFG)
+
+#### PATHO PERMANOVA ####
+PATHOFG = read.table("PATHOFG.txt", header=T, sep="\t")
+PATHOFG= na.omit (PATHOFG)
+str(PATHOFG)
+
+PATHOFG.Perm = PATHOFG [9:39]
+
+PATHOFG.bc = bcdist(PATHOFG.Perm , rmzero=FALSE)     
+Island = PATHOFG[,2] 
+Size = PATHOFG[,4] 
+treeremov =PATHOFG[,5] 
+mossremov  =PATHOFG[,6] 
+schrubremov =PATHOFG[,7] 
+permfinal18<-adonis(PATHOFG.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal18<-adonis(PATHOFG.bc~ Size*treeremov*mossremov*schrubremov,  permutations=999, strata = Island)
+permfinal18
+
+#### ERISAP ####
+ERISAP = (GroupRelFG$ERI+GroupRelFG$ROOT+GroupRelFG$ECM)/(GroupRelFG$SAP+GroupRelFG$MOULD+GroupRelFG$PATHO)
+ERISAP = (GroupRelFG$ECM)/(GroupRelFG$SAP)
+
+modelfinal269 = lme (ERISAP ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal269)
+
+
+
+modelfinal4 = lme (ERISAP~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = GroupRelFG)
+anova(modelfinal4)
+
+par(mfrow=c(2,2))
+interaction.plot(GroupRelFG$Size,GroupRelFG$treerem,ERISAP )
+interaction.plot(GroupRelFG$Size,GroupRelFG$mossrem,ERISAP )
+interaction.plot(GroupRelFG$Size,GroupRelFG$schrubrem,ERISAP ) 
+
+par(mfrow=c(2,2))
+boxplot (ERISAP  ~ treerem*Size,  data = GroupRelFG)
+boxplot (ERISAP  ~ mossrem*Size, data = GroupRelFG)
+boxplot (ERISAP  ~ schrubrem*Size,   data = GroupRelFG)
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs=c(.02, .98), na.rm = na.rm, ...)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  y
+}
+z <- remove_outliers(ERISAP)
+par(mfrow=c(1,1))
+boxplot (z ~ Size, notch=TRUE,  data = GroupRelFG)
+boxplot (z   ~ treerem*Size,  data = GroupRelFG)
+boxplot (z   ~ mossrem*Size, data = GroupRelFG)
+boxplot (z   ~ schrubrem*Size, data = GroupRelFG)
+
+par(mfrow=c(1,1))
+boxplot (z   ~ treerem*Size, data = GroupRelFG)
+boxplot (z   ~ schrubrem*Size, data = GroupRelFG)
+boxplot (z   ~ Plot*Size, data = GroupRelFG)
+
+
+
+#### ERISAP  PERMANOVA ####
+ERISAP.Perm = ERISAP 
+
+ERISAP.bc = bcdist(ERISAP.Perm , rmzero=FALSE)     
+Island = GroupRelFG[,2] 
+Size = GroupRelFG[,4] 
+treeremov =GroupRelFG[,5] 
+mossremov  =GroupRelFG[,6] 
+schrubremov =GroupRelFG[,7] 
+permfinal18<-adonis(ERISAP.bc~ Size*treeremov*mossremov*schrubremov+Island, permutations=999, strata = Island)
+#permfinal18<-adonis(ERISAP.bc~ Size*treeremov*mossremov*schrubremov,  permutations=999, strata = Island)
+permfinal18
+
+
+#################################################  
+##############    Ward Clustering ###############  
+#################################################
+
+####  Ward PVclust ######
+library(pvclust)
+
+CountFG = read.table("CountFGnoNA.txt", header=T, sep="\t")
+str(CountFG)
+FunFGWARD=CountFG[,9:2982]  ########## TOTAL 
+
+maxab <- apply(FunFGWARD, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(FunFGWARD)
+n1 <- names(which(maxab < 2)) # remove the genera with less than 1 Count
+FunFGWARD <- FunFGWARD[, -which(names(FunFGWARD) %in% n1)]
+dim(FunFGWARD)
+
+test = meandist(vegdist(FunFGWARD,method="horn"), CountFG$PlotSize)
+
+fit <- pvclust(test, method.hclust="ward.D",  method.dist="cor", nboot=1000) ########  Ward Hierarchical Clustering with Bootstrapped p values
+plot(fit) # dendogram with p values
+pvrect(fit, alpha=.95)# # add rectangles around groups highly supported by the data
+#seplot(fit, identify=TRUE)
+par(mfrow=c(1,1))
+
+#### Ward Hclust ######## 
+d<- vegdist(FunFGWARD , method="horn") #   Do the clustering. 
+pfit <- hclust(d, method="ward.D")   #   Plot the dendrogram.
+plot(pfit, labels=CountFG$PlotSize)     
+rect.hclust(pfit, k=4)
+
+#################################################  
+##################  Heatmap  ################## 
+#################################################
+
+########## Heatmap All samples #######
+
+library(gplots)  # for heatmap.2
+library(Heatplus)
+library(vegan)
+library(RColorBrewer)
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t" )
+FungiRelFG = na.omit (FungiRelFG)
+dim(FungiRelFG)
+
+data.prop <- FungiRelFG[9:2982]      #File 
+
+row.names(data.prop) <- FungiRelFG$Name
+
+scaleyellowred <- colorRampPalette(c("lightblue","lightyellow",  "orange", "red"), space = "rgb")(100) #PaletteColor
+#heatmap(as.matrix(data.prop), Rowv = NA, Colv = NA, col = scaleyellowred) # AllGroups
+
+maxab <- apply(data.prop, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+n1 <- names(which(maxab < 5)) # remove the genera with less than xx% as their maximum relative abundance
+data.prop.1 <- data.prop[, -which(names(data.prop) %in% n1)]
+dim(data.prop.1)
+heatmap(as.matrix(data.prop.1), Rowv = NA, Colv = NA, col = scaleyellowred, margins = c(10, 2))
+
+data.dist <- vegdist(data.prop, method = "bray")
+row.clus <- hclust(data.dist, "aver")
+heatmap(as.matrix(data.prop.1), Rowv = as.dendrogram(row.clus), Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist.g <- vegdist(t(data.prop.1), method = "bray")
+col.clus <- hclust(data.dist.g, "aver")
+# make the heatmap with Rowv = as.dendrogram(row.clus)
+heatmap(as.matrix(data.prop.1), Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, margins = c(10, 3))
+
+var1 = c("1",  "1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1")
+var1 <- replace(var1, which(var1 == 1), "deepskyblue") # 1 = no, 2 = yes
+var1 <- replace(var1, which(var1 == 2), "green")
+cbind(row.names(data.prop), var1)
+heatmap.2(as.matrix(data.prop.1),Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, RowSideColors = var1,  margins = c(10, 3))
+
+
+plot(annHeatmap2(as.matrix(data.prop.1),  col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(151), breaks = 150,
+                   dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12))))
+
+
+plot(annHeatmap2(as.matrix(data.prop.1), col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(151), breaks = 150, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12)), ann = list(Row = list(data = ann.dat))))
+
+var1 = c("1",  "1",  "1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"2",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1",	"1")
+var2 = c("small",  "medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"small",	"medium",	"large",	"large",	"medium",	"large",	"medium",	"large",	"small",	"small",	"large",	"medium",	"small",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"medium",	"small",	"medium",	"large",	"small",	"large",	"medium",	"large",	"small",	"medium",	"small",	"large",	"small",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"medium",	"small",	"large",	"medium",	"large",	"small",	"medium",	"small",	"large")
+ann.dat <- data.frame(var1,var2)
+
+plot(annHeatmap2(as.matrix(data.prop.1), col = colorRampPalette(c("lightblue", "orange", "red"), space = "rgb")(201), breaks = 200, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 239)), ann = list(Row = list(data = ann.dat))))
+
+###### Heatmap sup to 1% rel abundance ########
+
+FungiRelFG = read.table("FungiRelFG.txt", header=T, sep="\t" )
+FungiRelFG = na.omit (FungiRelFG)
+datatot = FungiRelFG [,9:2982]
+str(FungiRelFG )
+head(datatot)
+
+Name=FungiRelFG[,1]
+testPlotSize = aggregate(. ~ Name, datatot, mean)
+str(test)
+row.names(testPlotSize) <- testPlotSize$Name
+testPlotSize = testPlotSize[,-1]
+
+scaleyellowred <- colorRampPalette(c("lightyellow", "red"), space = "rgb")(100) #PaletteColor
+#heatmap(as.matrix(testPlotSize), Rowv = NA, Colv = NA, col = scaleyellowred) # AllGroups
+
+maxab <- apply(testPlotSize, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+n1 <- names(which(maxab < 1)) # remove the genera with less than xx% as their maximum relative abundance
+testPlotSize.1 <- testPlotSize[, -which(names(testPlotSize) %in% n1)]
+dim(testPlotSize.1)
+heatmap(as.matrix(testPlotSize.1), Rowv = NA, Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist <- vegdist(testPlotSize, method = "bray")
+row.clus <- hclust(data.dist , "ward.D")
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist.g <- vegdist(t(testPlotSize.1), method = "bray")# calculate the Bray-Curtis dissimilarity matrix on the full dataset
+col.clus <- hclust(data.dist.g, "ward.D") # make the heatmap with Rowv = as.dendrogram(row.clus)
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, margins = c(10, 3))
+
+shrubrem = c("1",  "1",	"2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1")
+shrubrem <- replace(shrubrem , which(shrubrem  == 1), "deepskyblue") # 1 = no, 2 = yes
+shrubrem  <- replace(shrubrem , which(shrubrem  == 2), "green")
+cbind(row.names(testPlotSize), shrubrem )
+heatmap.2(as.matrix(testPlotSize.1),Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, RowSideColors = shrubrem ,  margins = c(10, 8))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1),  col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(51), breaks = 50,
+                 dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12))))
+
+size = c("large",  "large",	"large",	"large",	"large",	"large",	"large",	"large",	"medium",	"medium",	"medium",	"medium",	"medium",	"medium",	"medium",	"medium",	"small",	"small",	"small",	"small",	"small",	"small",	"small",	"small")
+treeremov = c("yes",  "yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no")
+mossremov = c("no",  "yes",	"no",	"yes",	"yes",	"no",	"yes",	"no",	"no",	"yes",	"no",	"yes",	"yes",	"no",	"yes",	"no",	"no",	"yes",	"no",	"yes",	"yes",	"no",	"yes",	"no")
+shrubremov = c( "no",  "no",	"yes",	"yes",	"no",	"yes",	"yes",	"no",	"no",	"no",	"yes",	"yes",	"no",	"yes",	"yes",	"no",	"no",	"no",	"yes",	"yes",	"no",	"yes",	"yes",	"no")
+ann.dat <- data.frame(size,treeremov,mossremov,shrubremov)
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(51), breaks = 50, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12)), ann = list(Row = list(data = ann.dat))))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightblue", "orange", "red"), space = "rgb")(51), breaks = 50, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = , labels = list(Col = list(nrow = 3)), ann = list(Row = list(data = ann.dat))))
+
+###### Heatmap between 1 and 5% rel abundance #####
+maxab2 <- apply(testPlotSize, 2, max)
+n2 <- names(which(maxab2 > 5)) # remove the genera with less than xx% as their maximum relative abundance
+testPlotSize.1 <- testPlotSize.1[, -which(names(testPlotSize.1) %in% n2)]
+dim(testPlotSize.1)
+heatmap(as.matrix(testPlotSize.1), Rowv = NA, Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist <- vegdist(testPlotSize, method = "bray")
+row.clus <- hclust(data.dist , "ward.D")
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist.g <- vegdist(t(testPlotSize.1), method = "bray")# calculate the Bray-Curtis dissimilarity matrix on the full dataset
+col.clus <- hclust(data.dist.g, "ward.D") # make the heatmap with Rowv = as.dendrogram(row.clus)
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, margins = c(10, 3))
+
+shrubrem = c("1",  "1",  "2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1")
+shrubrem <- replace(shrubrem , which(shrubrem  == 1), "deepskyblue") # 1 = no, 2 = yes
+shrubrem  <- replace(shrubrem , which(shrubrem  == 2), "green")
+cbind(row.names(testPlotSize), shrubrem )
+heatmap.2(as.matrix(testPlotSize.1),Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, RowSideColors = shrubrem ,  margins = c(10, 8))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1),  col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(151), breaks = 150,
+                 dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12))))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(151), breaks = 150, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12)), ann = list(Row = list(data = ann.dat))))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightblue", "orange", "red"), space = "rgb")(151), breaks = 150, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = , labels = list(Col = list(nrow = 3)), ann = list(Row = list(data = ann.dat))))
+
+###### Heatmap sup to 5% rel abundance ###########
+
+maxab <- apply(testPlotSize, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+n1 <- names(which(maxab < 5)) # remove the genera with less than xx% as their maximum relative abundance
+testPlotSize.1 <- testPlotSize[, -which(names(testPlotSize) %in% n1)]
+dim(testPlotSize.1)
+heatmap(as.matrix(testPlotSize.1), Rowv = NA, Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist <- vegdist(testPlotSize, method = "bray")
+row.clus <- hclust(data.dist , "ward.D")
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = NA, col = scaleyellowred, margins = c(10, 3))
+
+data.dist.g <- vegdist(t(testPlotSize.1), method = "bray")# calculate the Bray-Curtis dissimilarity matrix on the full dataset
+col.clus <- hclust(data.dist.g, "ward.D") # make the heatmap with Rowv = as.dendrogram(row.clus)
+heatmap(as.matrix(testPlotSize.1), Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, margins = c(10, 3))
+
+shrubrem = c("1",  "1",  "2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1",	"1",	"1",	"2",	"2",	"1",	"2",	"2",	"1")
+shrubrem <- replace(shrubrem , which(shrubrem  == 1), "deepskyblue") # 1 = no, 2 = yes
+shrubrem  <- replace(shrubrem , which(shrubrem  == 2), "green")
+cbind(row.names(testPlotSize), shrubrem )
+heatmap.2(as.matrix(testPlotSize.1),Rowv = as.dendrogram(row.clus), Colv = as.dendrogram(col.clus), col = scaleyellowred, RowSideColors = shrubrem ,  margins = c(10, 8))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1),  col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(51), breaks = 50,
+                 dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12))))
+
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightyellow", "red"), space = "rgb")(51), breaks = 50, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = 3, labels = list(Col = list(nrow = 12)), ann = list(Row = list(data = ann.dat))))
+
+plot(annHeatmap2(as.matrix(testPlotSize.1), col = colorRampPalette(c("lightblue", "orange", "red"), space = "rgb")(51), breaks = 50, dendrogram = list(Row = list(dendro = as.dendrogram(row.clus)), Col = list(dendro = as.dendrogram(col.clus))), legend = , labels = list(Col = list(nrow = 3)), ann = list(Row = list(data = ann.dat))))
+
+#################################################  
+##############    Co_Occurence    ###############  
+#################################################
+
+#####Co_Occurence 100 first OTUs #####
+
+library(qgraph)
+library(igraph)
+library(reshape)
+
+setwd("C:/Users/nfanin/Dropbox/Sweden/Statistic")     
+NetworkFG = read.table("NetworkFG.txt", header=T, sep="\t")
+str(NetworkFG)
+
+comm.data=NetworkFG[,7:106]
+dim(comm.data)
+
+comm.data.read<-subset(NetworkFG, Reads >= 300)
+str(comm.data.read)
+dim(comm.data.read)
+comm.data2<-rrarefy(comm.data.read[,-c(1:6)],300)
+dim(comm.data2)
+
+par(mfrow=c(1,1))
+totocc<-colSums(comm.data2)
+x<-cor(comm.data2, method="spearman")
+s=abs(x)
+a=dim(s)
+for (i in c(1:a[1]))  {
+  for (j in c(1:a[2])){
+    if (s[i,j]<0.30)   {
+      s[i,j]=0
+    }
+  }
+}
+s
+graph<-graph.adjacency(s, weighted=TRUE, mode="undirected", diag=FALSE)
+w<-abs(E(graph)$weight)
+w<-as.matrix(w)
+plot(graph, vertex.size=4, vertex.label.dist=0.5, vertex.color="red",edge.width=w*10)
+plot(graph, vertex.size=totocc/1000, edge.width=1, vertex.color="red", layout=layout.circle,edge.curved=seq(-0.5, 0.5, length = ecount(graph)))
+plot(graph, vertex.size=4, edge.width=w*2, vertex.color="red", layout=layout.circle,edge.curved=seq(-0.5, 0.5, length = ecount(graph)))
+plot(graph, vertex.size=totocc/1000, edge.width=w*2, vertex.color="red",layout=layout.spring)
+plot(graph, vertex.size=totocc/1000, edge.width=w*2, vertex.color="red",layout=layout.random)
+plot(graph, vertex.size=totocc/1000, edge.width=w*2,vertex.color="red", layout=layout.sphere)
+plot(graph, vertex.size=totocc/1000, edge.width=w*2, vertex.color="red",layout=layout.kamada.kawai)
+plot(graph, vertex.size=totocc/1000, edge.width=w*2, vertex.color="red",layout=layout.fruchterman.reingold)
+
+tkplot(graph)
+rglplot(graph)
+plot(graph, vertex.size=4,vertex.label.dist=0.5, vertex.color="red", edge.arrow.size=0.5, layout=layout.circle)
+
+transitivity(graph)                                # interconnectivit? du r?seau, fermeture du r?seau
+betweenness(graph)                                 # groupes centraux
+degree(graph)                                      # nombre de liens par noeud
+average.path.length(graph)                          # longueur moyenne de connection s?parant 2 noeuds
+graph                                               # densit? ; prendre le nombre de liens  (vertex) / (nombre de noeuds (nn) * nn -1) / 2)  (nodes)
+200/((114*113)/2)
+sum(degree(graph))/16          
+
+##### Co_Occurence per FG  #####
+
+ERI<- c(8:17)
+ROOT<- c(45:59)
+ECM <- c(1:7)
+SAP <- c(60:89)
+LICHEN <- c(18:21)
+PATHO <- c(33:44)
+MOULD <- c(22:32)
+UNK<- c(90:100)
+
+list.fungi<- list(SAP=SAP,MOULD=MOULD,LICHEN=LICHEN,ECM=ECM,PATHO =PATHO,ROOT=ROOT,ERI=ERI, UNK=UNK)
+newcol = c("purple", "blue", "green", "red","lightgreen","brown","yellow","grey")
+qgraph(cor(comm.data2), minimum=0.2, cut=0.4, vsize=2, groups=list.fungi, layout = "circular")
+qgraph(cor(comm.data2), minimum=0.2, cut=0.2, vsize=2, groups=list.fungi, layout = "spring", overlay=TRUE)
+qgraph(cor(comm.data2), minimum=0.2, cut=0.4, vsize=2, groups=list.fungi, layout = "circle")
+qgraph(cor(comm.data2), groups=list.fungi, layout = "circle")
+
+graph=as.data.frame(get.edgelist(graph))
+write.table(graph, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/s.xls")
+
+#################################################  
+###################    Venn    ################## 
+#################################################
+
+##### Venn Diagramm #####
+
+# http://bioinfogp.cnb.csic.es/tools/venny/
+
+library(ggplot2)
+library(RColorBrewer)
+library(reshape)
+library(VennDiagram)
+library(pheatmap)
+
+setwd("C:/Users/Nicolas/Dropbox/Sweden/Statistic")     
+VennSize = read.table("VennSize.txt", header=T, sep="\t")
+str(VennSize)
+
+large=VennSize$large
+medium=VennSize$medium
+small=VennSize$small
+
+str(small)
+
+Input  <-list(large, medium, small)
+a=venn(Input, intersections=TRUE)
+isect <- attr(a, "intersection")
+str(isect)
+summary(isect)
+
+################################################  
+##################  MA plot #####################
+#################################################
+
+##### MA plot #####
+
+library(Rcpp)
+library(DESeq2)
+library(limma)
+library(affydata)
+library(pasilla)
+library(RColorBrewer)
+library(pheatmap)
+library(PoiClaClu)
+library(ggplot2)
+library(genefilter)
+
+MApCount= read.table("MAplotFG.txt", header=T, sep="\t", row.names=1)
+str(MApCount) # see http://www.bioconductor.org/help/workflows/rnaseqGene/
+
+CeleDesign <- data.frame(row.names = colnames(MApCount), 
+                        condition = factor(c("large","medium", "small","large","medium",  "small","large","medium",  "small","large","medium",  "small","large","medium",  "small","large","medium",  "small","large","medium",  "small","large","medium",  "small")),
+                         lybtype =   factor(c("1",  "1",  "1",	"2",	"2",	"2",	"3",	"3",	"3",	"4",	"4",	"4",	"5",	"5",	"5",	"6",	"6",	"6",	"7",	"7",	"7",	"8",	"8",	"8")))
+
+
+ # factor(c("no",  "no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no")))
+ # factor(c("1",  "1",  "1",	"2",	"2",	"2",	"3",	"3",	"3",	"4",	"4",	"4",	"5",	"5",	"5",	"6",	"6",	"6",	"7",	"7",	"7",	"8",	"8",	"8")))
+
+dds <- DESeqDataSetFromMatrix(countData = MApCount ,
+                              colData = CeleDesign,
+                              design = ~ condition + lybtype)
+
+nrow(dds)
+dds <- dds[ rowSums(counts(dds)) > 1, ] # remove rows with no counts or only a single count across all samples
+nrow(dds)
+rld <- rlog(dds, blind=FALSE) # regularized-logarithm transformation 
+head(assay(rld), 3)
+
+par( mfrow = c( 1, 2 ) )
+dds <- estimateSizeFactors(dds)
+plot(log2(counts(dds, normalized=TRUE)[,1:2] + 1), pch=16, cex=0.3)
+plot(assay(rld)[,1:2], pch=16, cex=0.3)
+
+sampleDists <- dist( t( assay(rld) ) ) # Euclidean distance based on rlog
+sampleDists
+
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colnames(sampleDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix, clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists, col=colors)
+
+poisd <- PoissonDistance(t(counts(dds))) # Poisson Distance
+samplePoisDistMatrix <- as.matrix( poisd$dd ) # Measure of dissimilarity between counts also takes the inherent variance structure of counts into consideration when calculating the distances between samples
+rownames(samplePoisDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colnames(samplePoisDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+pheatmap(samplePoisDistMatrix, clustering_distance_rows=poisd$dd,  clustering_distance_cols=poisd$dd, col=colors)
+
+DESeq2::plotPCA(rld, intgroup = c("condition", "lybtype")) #PCA basic 
+data <- DESeq2::plotPCA(rld, intgroup = c( "condition", "lybtype"), returnData=TRUE)
+percentVar <- round(100 * attr(data, "percentVar"))
+ggplot(data, aes(PC1, PC2, color=lybtype, shape=condition)) + geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance"))
+
+mdsData <- data.frame(cmdscale(sampleDistMatrix)) #NMDS basic 
+mds <- cbind(mdsData, as.data.frame(colData(rld)))
+ggplot(mds, aes(X1,X2,color=lybtype,shape=condition)) + geom_point(size=3)
+
+mdsPoisData <- data.frame(cmdscale(samplePoisDistMatrix)) #NMDS poisson
+mdsPois <- cbind(mdsPoisData, as.data.frame(colData(dds)))
+ggplot(mdsPois, aes(X1,X2,color=lybtype,shape=condition)) + geom_point(size=3)
+
+dds <- DESeq(dds) # Differential expression analysis
+res <- results(dds)
+mcols(res, use.names=TRUE)
+summary(res)
+res.05 <- results(dds, alpha=.05)
+table(res.05$pval < .05)
+resLFC1 <- results(dds, lfcThreshold=1)
+table(resLFC1$pval < 0.1)
+
+res2=results(dds, contrast=c("condition", "small", "large"))
+mcols(res2, use.names=TRUE)
+summary(res2)
+
+sum(res$pvalue < 0.1, na.rm=TRUE)
+sum(!is.na(res$pvalue))
+sum(res$pvalue < 0.1, na.rm=TRUE)
+resSig <- subset(res, padj < 0.1)
+head(resSig[ order(resSig$log2FoldChange), ]) # down-regulation
+head(resSig[ order(resSig$log2FoldChange, decreasing=TRUE), ]) # up-regulation
+resSig=as.data.frame(resSig)
+
+topOTU <- rownames(res)[which.min(res$pvalue)]
+plotCounts(dds, gene=topOTU , intgroup=c("lybtype"))
+data <- plotCounts(dds, gene=topOTU, intgroup=c("lybtype","condition"), returnData=TRUE)
+ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+
+ggplot(data, aes(x=lybtype, y=count, fill=lybtype)) + scale_y_log10() + 
+  geom_dotplot(binaxis="y", stackdir="center")
+
+ggplot(data, aes(x=lybtype, y=count, color=condition, group=condition)) +
+  scale_y_log10() + geom_point(size=3) + geom_line()
+
+plotCounts(dds, gene="NICO191" , intgroup=c("lybtype")) # Each OTU individually
+data <- plotCounts(dds, gene="NICO191", intgroup=c("lybtype","condition"), returnData=TRUE)
+ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+
+par(mfrow=c(1,1)) # MAplot
+DESeq2::plotMA(res, ylim=c(-5,5), cex=1.00)
+
+topOTU <- rownames(resLFC1)[which.min(resLFC1$pvalue)]
+with(resLFC1[topOTU, ], {
+  points(baseMean, log2FoldChange, col="dodgerblue", cex=2, lwd=2)
+  text(baseMean, log2FoldChange, topOTU, pos=2, col="dodgerblue")
+})
+
+hist(res$pvalue[res$baseMean > 1], breaks=0:20/20, col="grey50", border="white")
+
+topVarGenes <- head(order(rowVars(assay(rld)),decreasing=TRUE),50)
+mat <- assay(rld)[ topVarGenes, ]
+mat <- mat - rowMeans(mat)
+df <- as.data.frame(colData(rld)[,c("condition","lybtype")])
+pheatmap(mat, annotation_col=df)
+
+##### MA plot Tot #####
+
+MApCount= read.table("MAplotFGTot.txt", header=T, sep="\t", row.names=1)
+str(MApCount) # see http://www.bioconductor.org/help/workflows/rnaseqGene/
+
+CeleDesign <- data.frame(row.names = colnames(MApCount), 
+                         condition = factor(c("small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"small",	"medium",	"large",	"large",	"medium",	"large",	"medium",	"large",	"small",	"small",	"large",	"medium",	"small",	"large",	"small",	"medium",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"small",	"medium",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"medium",	"small",	"medium",	"large",	"small",	"large",	"medium",	"large",	"small",	"medium",	"small",	"large",	"small",	"large",	"small",	"medium",	"large",	"medium",	"large",	"small",	"medium",	"large",	"small",	"large",	"small",	"medium",	"large",	"small",	"medium",	"small",	"medium",	"large",	"medium",	"small",	"large",	"medium",	"large",	"small",	"medium",	"small",	"large")),
+                         lybtype =  factor(c("no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no")))
+
+
+                       
+dds <- DESeqDataSetFromMatrix(countData = MApCount ,
+                              colData = CeleDesign,
+                              design = ~ condition + lybtype)
+
+nrow(dds)
+dds <- dds[ rowSums(counts(dds)) > 1, ] # remove rows with no counts or only a single count across all samples
+nrow(dds)
+rld <- varianceStabilizingTransformation(dds) # regularized-logarithm transformation 
+head(assay(rld), 3)
+
+par( mfrow = c( 1, 2 ) )
+dds <- estimateSizeFactors(dds)
+plot(log2(counts(dds, normalized=TRUE)[,1:2] + 1), pch=16, cex=0.3)
+plot(assay(rld)[,1:2], pch=16, cex=0.3)
+
+sampleDists <- dist( t( assay(rld) ) ) # Euclidean distance based on rlog
+sampleDists
+
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colnames(sampleDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix, clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists, col=colors)
+
+poisd <- PoissonDistance(t(counts(dds))) # Poisson Distance
+samplePoisDistMatrix <- as.matrix( poisd$dd ) # Measure of dissimilarity between counts also takes the inherent variance structure of counts into consideration when calculating the distances between samples
+rownames(samplePoisDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+colnames(samplePoisDistMatrix) <- paste( rld$condition, rld$lybtype, sep="-" )
+pheatmap(samplePoisDistMatrix, clustering_distance_rows=poisd$dd,  clustering_distance_cols=poisd$dd, col=colors)
+
+DESeq2::plotPCA(rld, intgroup = c("condition", "lybtype")) #PCA basic 
+data <- DESeq2::plotPCA(rld, intgroup = c( "condition", "lybtype"), returnData=TRUE)
+percentVar <- round(100 * attr(data, "percentVar"))
+ggplot(data, aes(PC1, PC2, color=lybtype, shape=condition)) + geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance"))
+
+mdsData <- data.frame(cmdscale(sampleDistMatrix)) #NMDS basic 
+mds <- cbind(mdsData, as.data.frame(colData(rld)))
+ggplot(mds, aes(X1,X2,color=lybtype,shape=condition)) + geom_point(size=3)
+
+mdsPoisData <- data.frame(cmdscale(samplePoisDistMatrix)) #NMDS poisson
+mdsPois <- cbind(mdsPoisData, as.data.frame(colData(dds)))
+ggplot(mdsPois, aes(X1,X2,color=lybtype,shape=condition)) + geom_point(size=3)
+
+
+dds <- DESeq(dds) # Differential expression analysis
+res <- results(dds)
+mcols(res, use.names=TRUE)
+summary(res)
+res.05 <- results(dds, alpha=.05)
+table(res.05$pval < .05)
+summary(res.05)
+resLFC1 <- results(dds, lfcThreshold=1)
+summary(resLFC1)
+table(resLFC1$pval < 0.1)
+
+res2=results(dds, contrast=c("condition", "small", "large"))
+mcols(res2, use.names=TRUE)
+summary(res2)
+
+sum(res$pvalue < 0.1, na.rm=TRUE)
+sum(!is.na(res$pvalue))
+sum(res$pvalue < 0.1, na.rm=TRUE)
+resSig <- subset(res, padj < 0.05)
+head(resSig[ order(resSig$log2FoldChange), ]) # down-regulation
+head(resSig[ order(resSig$log2FoldChange, decreasing=TRUE), ]) # up-regulation
+resSig=as.data.frame(resSig)
+# write.table(resSig, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/OTUsensitive.csv")
+
+topOTU <- rownames(res)[which.min(res$pvalue)]
+plotCounts(dds, gene=topOTU , intgroup=c("lybtype"))
+data <- plotCounts(dds, gene=topOTU, intgroup=c("lybtype","condition"), returnData=TRUE)
+ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+
+ggplot(data, aes(x=lybtype, y=count, fill=lybtype)) + scale_y_log10() + 
+  geom_dotplot(binaxis="y", stackdir="center")
+
+ggplot(data, aes(x=lybtype, y=count, color=condition, group=condition)) +
+  scale_y_log10() + geom_point(size=3) + geom_line()
+
+plotCounts(dds, gene="NICO295" , intgroup=c("lybtype")) # Each OTU individually
+data <- plotCounts(dds, gene="NICO295", intgroup=c("lybtype","condition"), returnData=TRUE)
+ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3) 
+
+library( ReporteRs )
+require( ggplot2 )
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+par(mfrow=c(1,1)) # MAplot
+DESeq2::plotMA(res.05,  cex=0.8,ylim=c(-4,4))
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(res.05, ylim=c(-4,4), cex=0.5)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resLFC1,  cex=0.5)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+
+topOTU <- rownames(resLFC1)[which.min(resLFC1$padj)]
+with(resLFC1[topOTU, ], {
+  points(baseMean, log2FoldChange, col="dodgerblue", cex=2, lwd=2)
+  text(baseMean, log2FoldChange, topOTU, pos=2, col="dodgerblue")
+})
+
+hist(res$pvalue[res$baseMean > 1], breaks=0:20/20, col="grey50", border="white")
+
+topVarGenes <- head(order(rowVars(assay(rld)),decreasing=TRUE),20)
+mat <- assay(rld)[ topVarGenes, ]
+mat <- mat - rowMeans(mat)
+df <- as.data.frame(colData(rld)[,c("condition","lybtype")])
+pheatmap(mat, annotation_col=df)
+
+
+# compute four additionall MA tests
+ddsNoPrior <- DESeq(dds, betaPrior=FALSE)
+resGA <- results(dds, lfcThreshold=.5, altHypothesis="greaterAbs")
+resLA <- results(ddsNoPrior, lfcThreshold=.5, altHypothesis="lessAbs")
+resG <- results(dds, lfcThreshold=.5, altHypothesis="greater")
+resL <- results(dds, lfcThreshold=.5, altHypothesis="less")
+
+# plot MA for each test
+par(mfrow=c(2,2),mar=c(2,2,1,1))
+yl <- c(-2.5,2.5)
+DESeq2::plotMA(resGA, ylim=yl)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resLA, ylim=yl)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resG, ylim=yl)
+abline(h=.5,col="dodgerblue",lwd=2)
+DESeq2::plotMA(resL, ylim=yl)
+abline(h=-.5,col="dodgerblue",lwd=2)
+
+
+
+##### MA plot SMALL / LARGE / MEDIUM #####
+
+MApCount= read.table("MAplotFGmedium.txt", header=T, sep="\t", row.names=1)
+str(MApCount) # see http://www.bioconductor.org/help/workflows/rnaseqGene/
+
+#Small
+CeleDesign <- data.frame(row.names = colnames(MApCount), condition = factor(c("no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	  "no")))
+
+#Medium
+#CeleDesign <- data.frame(row.names = colnames(MApCount), condition = factor(c("no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no")))
+
+#Large
+#CeleDesign <- data.frame(row.names = colnames(MApCount), condition = factor(c("no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"yes",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no",	"no")))
+
+
+dds <- DESeqDataSetFromMatrix(countData = MApCount ,
+                              colData = CeleDesign,
+                              design = ~ condition )
+
+nrow(dds)
+dds <- dds[ rowSums(counts(dds)) > 1, ] # remove rows with no counts or only a single count across all samples
+nrow(dds)
+rld <- varianceStabilizingTransformation(dds) # regularized-logarithm transformation 
+head(assay(rld), 3)
+
+par( mfrow = c( 1, 2 ) )
+dds <- estimateSizeFactors(dds)
+plot(log2(counts(dds, normalized=TRUE)[,1:2] + 1), pch=16, cex=0.3)
+plot(assay(rld)[,1:2], pch=16, cex=0.3)
+
+sampleDists <- dist( t( assay(rld) ) ) # Euclidean distance based on rlog
+sampleDists
+
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <- paste( rld$condition, sep="-" )
+colnames(sampleDistMatrix) <- paste( rld$condition, sep="-" )
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix, clustering_distance_rows=sampleDists, clustering_distance_cols=sampleDists, col=colors)
+
+poisd <- PoissonDistance(t(counts(dds))) # Poisson Distance
+samplePoisDistMatrix <- as.matrix( poisd$dd ) # Measure of dissimilarity between counts also takes the inherent variance structure of counts into consideration when calculating the distances between samples
+rownames(samplePoisDistMatrix) <- paste( rld$condition,  sep="-" )
+colnames(samplePoisDistMatrix) <- paste( rld$condition,  sep="-" )
+pheatmap(samplePoisDistMatrix, clustering_distance_rows=poisd$dd,  clustering_distance_cols=poisd$dd, col=colors)
+
+DESeq2::plotPCA(rld, intgroup = c("condition")) #PCA basic 
+data <- DESeq2::plotPCA(rld, intgroup =  "condition", returnData=TRUE)
+percentVar <- round(100 * attr(data, "percentVar"))
+ggplot(data, aes(PC1, PC2, color=lybtype, shape=condition)) + geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance"))
+
+mdsData <- data.frame(cmdscale(sampleDistMatrix)) #NMDS basic 
+mds <- cbind(mdsData, as.data.frame(colData(rld)))
+ggplot(mds, aes(X1,X2,color=conditio,shape=condition)) + geom_point(size=3)
+
+mdsPoisData <- data.frame(cmdscale(samplePoisDistMatrix)) #NMDS poisson
+mdsPois <- cbind(mdsPoisData, as.data.frame(colData(dds)))
+ggplot(mdsPois, aes(X1,X2,shape=condition)) + geom_point(size=3)
+
+
+dds <- DESeq(dds) # Differential expression analysis
+res <- results(dds)
+mcols(res, use.names=TRUE)
+summary(res)
+res.05 <- results(dds, alpha=.05)
+table(res.05$pval < .05)
+summary(res.05)
+resLFC1 <- results(dds, lfcThreshold=1)
+summary(resLFC1)
+table(resLFC1$pval < 0.1)
+
+sum(res$pvalue < 0.1, na.rm=TRUE)
+sum(!is.na(res$pvalue))
+sum(res$pvalue < 0.1, na.rm=TRUE)
+resSig <- subset(res, padj < 0.05)
+head(resSig[ order(resSig$log2FoldChange), ]) # down-regulation
+head(resSig[ order(resSig$log2FoldChange, decreasing=TRUE), ]) # up-regulation
+resSig=as.data.frame(resSig)
+#write.table(resSig, "C:/Users/nsfa0001/Dropbox/Sweden/Statistic/OTUsensitiveSchrubLarge.csv")
+
+topOTU <- rownames(res)[which.min(res$pvalue)]
+plotCounts(dds, gene=topOTU , intgroup=c("condition"))
+data <- plotCounts(dds, gene=topOTU, intgroup=c("condition"), returnData=TRUE)
+ggplot(data, aes(x=condition, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+
+ggplot(data, aes(x=condition, y=count, fill=condition)) + scale_y_log10() + 
+  geom_dotplot(binaxis="y", stackdir="center")
+
+ggplot(data, aes(x=condition, y=count, color=condition, group=condition)) +
+  scale_y_log10() + geom_point(size=3) + geom_line()
+
+plotCounts(dds, gene="NICO295" , intgroup=c("condition")) # Each OTU individually
+data <- plotCounts(dds, gene="NICO295", intgroup=c("condition"), returnData=TRUE)
+ggplot(data, aes(x=condition, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3) 
+
+library( ReporteRs )
+require( ggplot2 )
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(data, aes(x=lybtype, y=count, color=condition)) +  scale_y_log10() + 
+  geom_point(position=position_jitter(width=.1,height=0), size=3)
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+par(mfrow=c(1,1)) # MAplot
+DESeq2::plotMA(res.05,  cex=0.8,ylim=c(-4,4))
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(res.05, ylim=c(-4,4), cex=0.5)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resLFC1,  cex=0.5)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+
+topOTU <- rownames(resLFC1)[which.min(resLFC1$padj)]
+with(resLFC1[topOTU, ], {
+  points(baseMean, log2FoldChange, col="dodgerblue", cex=2, lwd=2)
+  text(baseMean, log2FoldChange, topOTU, pos=2, col="dodgerblue")
+})
+
+hist(res$pvalue[res$baseMean > 1], breaks=0:20/20, col="grey50", border="white")
+
+topVarGenes <- head(order(rowVars(assay(rld)),decreasing=TRUE),20)
+mat <- assay(rld)[ topVarGenes, ]
+mat <- mat - rowMeans(mat)
+df <- as.data.frame(colData(rld)[,c("condition","lybtype")])
+pheatmap(mat, annotation_col=df)
+
+
+# compute four additionall MA tests
+ddsNoPrior <- DESeq(dds, betaPrior=FALSE)
+resGA <- results(dds, lfcThreshold=.5, altHypothesis="greaterAbs")
+resLA <- results(ddsNoPrior, lfcThreshold=.5, altHypothesis="lessAbs")
+resG <- results(dds, lfcThreshold=.5, altHypothesis="greater")
+resL <- results(dds, lfcThreshold=.5, altHypothesis="less")
+
+# plot MA for each test
+par(mfrow=c(2,2),mar=c(2,2,1,1))
+yl <- c(-2.5,2.5)
+DESeq2::plotMA(resGA, ylim=yl)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resLA, ylim=yl)
+abline(h=c(-.5,.5),col="dodgerblue",lwd=2)
+DESeq2::plotMA(resG, ylim=yl)
+abline(h=.5,col="dodgerblue",lwd=2)
+DESeq2::plotMA(resL, ylim=yl)
+abline(h=-.5,col="dodgerblue",lwd=2)
+
+
+
+
+
+#################################################  
+#####################  CCA  #####################
+#################################################
+
+#### CCA ####
+
+setwd("C:/Users/Nicolas/Dropbox/Sweden/Statistic")     
+FungiRelFG1 = read.table("TotalTest.txt", header=T, sep="\t")
+str(FungiRelFG1)  
+
+CCA.FungiRelFG = FungiRelFG1 [18:2982] ########## TOTAL 
+CCA.EnvFG= FungiRelFG1 [1:17]
+CCA.var = FungiRelFG1 [1:8]
+str(CCA.EnvFG)
+
+maxab <- apply(CCA.FungiRelFG, 2, max) # determine the maximum relative abundance for each column
+head(maxab)
+dim(CCA.FungiRelFG)
+n1 <- names(which(maxab < 0.01)) # remove the genera with less than xx% as their maximum relative abundance
+CCA.FungiRelFG <- CCA.FungiRelFG[, -which(names(CCA.FungiRelFG) %in% n1)]
+dim(CCA.FungiRelFG)
+CCA.FungiRelFG = decostand(CCA.FungiRelFG, method = "hellinger")
+
+#Selection Forward
+R=cca(CCA.FungiRelFG ~ 1 +  Condition(Island) , data = CCA.EnvFG)  # Model with intercept only
+R2=cca(CCA.FungiRelFG ~ . + Condition(Island) , data = CCA.EnvFG)
+ordistep(R, scope = formula(R2), direction = "forward" , perm.max = 50)
+
+#Modele total
+R=cca(CCA.FungiRelFG ~ Condition(Island) + totalshrubmass + NH4 + totalmoss +  Nperarea + NO3 + Pperarea + Cperarea + mininP, data = CCA.EnvFG)
+summary(R)
+how <- how(nperm=99, plots = Plots(CCA.EnvFG$Island, type =  "free"))
+how <- how(nperm=99, blocks = CCA.EnvFG$Island)
+anova(R, by="term", permutations = how, model = "reduced")
+
+with(CCA.FungiRelFG, levels(Size))  ####Size                                                                                       
+scl <- 3                                                                                                               
+colvec <- c("red2", "green4", "mediumblue")    
+plot(R, type = "t", scaling = scl)                                                                                   
+with(CCA.FungiRelFG , points(R, display = "sites", col = colvec[Size], scaling = scl, pch =15 , bg = colvec[Size]))
+with(CCA.FungiRelFG , legend("topright", legend = levels(Size), bty = "n",  col = colvec, pch = 15, pt.bg = colvec)) 
+
+#################################################  
+##################  Diversity  ##################
+#################################################
+
+#### Diversity Metrics ####
+
+
+library(phyloseq)
+library(ggplot2)
+
+MApCount= read.table("DivFG2.txt", header=T, sep="\t", row.names=1)
+NamePhyl= read.table("NamePhylFG.txt", header=T, sep="\t", row.names=1)
+str(MApCount) #
+head(NamePhyl) #
+
+MApCount=MApCount[9:2982]
+
+MApCount= otu_table(MApCount, taxa_are_rows = FALSE) 
+dim(MApCount)
+MApCount <- prune_taxa(taxa_sums(MApCount) > 0, MApCount)
+dim(MApCount)
+NamePhyl=sample_data(NamePhyl)
+
+plot_richness(MApCount)
+plot_richness(MApCount, x = "NamePhyl$Size", measures = c("Shannon"))
+plot_richness(MApCount, x = "NamePhyl$Size", color = "NamePhyl$schrubremoval",measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7) 
+plot_richness(MApCount, x = "NamePhyl$schrubremoval",  color = "NamePhyl$Size",  measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7)
+plot_richness(MApCount, x = "NamePhyl$treeremoval",  color = "NamePhyl$Size",  measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7)
+plot_richness(MApCount, x = "NamePhyl$mossremoval",   color = "NamePhyl$Size",  measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7)
+
+p=plot_richness(MApCount, x = "NamePhyl$Size", color = "NamePhyl$schrubremoval",measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7) 
+p + geom_boxplot(data=p$data, aes(x=Size, y=value, color=NULL), alpha=0.1)
+
+p=plot_richness(MApCount, x = "NamePhyl$schrubremoval",  color = "NamePhyl$Size",  measures = c("Shannon")) + geom_point(size = 5, alpha = 0.7)
+p + geom_boxplot(data=p$data, aes(x=NamePhyl$schrubremoval, y=value, color=NULL), alpha=0.1)
+
+
+#### ADIV 
+DivFG = read.table("DivFG.txt", header=T, sep="\t")
+str(DivFG)
+
+comm.data<-subset(DivFG, Read >= 300)
+str(comm.data)
+dim(comm.data)
+comm.data2<-rrarefy(comm.data[,-c(1:9)],300)
+dim(comm.data2)
+
+Sha=diversity(comm.data2, index = "shannon")
+copa= cbind(comm.data[,c(1:9)], Sha)
+
+modelfinal1 = lme (Sha ~Size*treeremoval*mossremoval*schrubremoval, random = ~1|Island, data = copa)
+anova(modelfinal1)
+
+Num2=specnumber(comm.data2, MARGIN = 1)
+copa2= cbind(comm.data[,c(1:9)], Num2)
+#library(xlsx)
+#write.xlsx(copa2, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/AlphaDiv.xlsx")
+
+modelfinal1 = lme (Num2 ~Size*treeremoval*mossremoval*schrubremoval, random = ~1|Island, data = copa2)
+anova(modelfinal1)
+
+par(mfrow=c(2,2))
+boxplot (Num2 ~ Size, notch=TRUE,  data =copa2)
+boxplot (Num2 ~ treeremoval*Size, notch=TRUE, data = copa2)
+boxplot (Num2 ~ mossremoval*Size, notch=TRUE, data = copa2)
+boxplot (Num2 ~ schrubremoval*Size, notch=TRUE,  data = copa2)
+
+boxplot (Num2 ~ treeremoval, notch=TRUE,  data =copa2)
+boxplot (Num2 ~ mossremoval, notch=TRUE,  data =copa2)
+boxplot (Num2 ~ schrubremoval, notch=TRUE,  data =copa2)
+
+par(mfrow=c(1,1))
+boxplot (Num2 ~ Plot, notch=TRUE,  data =copa2)
+modelfinal1 = lme (Num2 ~Plot, random = ~1|Island, data = copa)
+anova(modelfinal1)
+
+par(mfrow=c(1,1))
+boxplot (Num2 ~ schrubremoval*Size, data = copa2)
+
+
+
+DiverFG = read.table("DiversityFG.txt", header=T, sep="\t")
+str(DiverFG)
+
+par(mfrow=c(1,1))
+boxplot (Diversity ~ schrubrem*Size, data = DiverFG)
+modelfinal1 = lme (Diversity ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = DiverFG, na.action=na.omit)
+anova(modelfinal1)
+
+
+#### BDIV 
+DivFG = read.table("DivFG.txt", header=T, sep="\t")
+str(DivFG)
+
+
+comm.data<-subset(DivFG, Read >= 300)
+str(comm.data)
+dim(comm.data)
+comm.data2<-rrarefy(comm.data[,-c(1:9)],300)
+dim(comm.data2)
+
+dis <- vegdist(comm.data2)
+Bdiv = betadiver(comm.data2 , "z")
+Bdiv1 <- with(comm.data, betadisper(Bdiv, schrubremoval))
+Bdiv1
+plot(Bdiv1)
+boxplot(Bdiv1, notch=TRUE)
+Bdiv2 <- with(comm.data, betadisper(Bdiv, Size))
+plot(Bdiv2)
+boxplot(Bdiv2)
+Bdiv2
+permutest(Bdiv2, pairwise = TRUE)
+
+
+#### Anne
+
+DivFG =subset (DivFG, Plot == "8") ########## control ONLY ##########
+str(DivFG)
+
+comm.data<-subset(DivFG, Read >= 300)
+str(comm.data2)
+dim(comm.data)
+comm.data2<-rrarefy(comm.data[,-c(1:9)],300)
+dim(comm.data2)
+
+Bdiv = betadiver(comm.data2 , "w")
+Bdiv2 <- with(comm.data, betadisper(Bdiv, Size))
+plot(Bdiv2)
+boxplot(Bdiv2)
+Bdiv2
+anova(Bdiv2, Size)
+
+library(xlsx)
+yep=write.xlsx(DivFG, "C:/Users/nicol/Dropbox/Sweden/Statistic/betaDiv.xlsx")
+yop=write.xlsx(Bdiv, "C:/Users/nicol/Dropbox/Sweden/Statistic/betaDiv3.xlsx")
+yip=write.xlsx(comm.data2, "C:/Users/nicol/Dropbox/Sweden/Statistic/betaDiv2.xlsx")
+
+  
+
+
+range(Bdiv - vegdist(comm.data2 ,binary=TRUE))
+
+
+  
+
+#### Comparison ADIV BDIV 
+
+par(mfrow=c(1,2))
+boxplot (Adiv ~ Size, notch=TRUE,  data =copa)
+boxplot(Bdiv2, notch=TRUE)
+boxplot (Adiv ~ schrubremoval, notch=TRUE,  data =copa)
+boxplot(Bdiv1, notch=TRUE)
+
+
+
+#################################################  
+##################  Multifunc  ##################
+#################################################
+
+library(devtools)
+#install_github("multifunc", username="jebyrnes", args='-l "C:/Program Files/R/R-3.2.4revised/library"')
+library(multifunc)
+library(ggplot2)
+library(gridExtra)
+library(colorRamps)
+library(nlme)
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(RColorBrewer)
+library(corrplot)
+library(reshape2)
+
+
+setwd("C:/Users/nicol/Dropbox/Sweden/Statistic")
+multifunc = read.table("MultifuncTot.txt", header=T, sep="\t")
+str(multifunc)
+
+#multifunc = subset  (multifunc, Size == "large")
+
+
+allVars <-qw(totalshrubmass,totalmoss, 	RootBiomass, Pperarea,	Nperarea,	Cperarea,	minN,	minP,	resinPO4,	resinminN,	SIR,	TotalPLFA,	Nematode,  TOPlitterbag ,AOAratio)
+varIdx <-which(names(multifunc ) %in% allVars)
+vars <-whichVars(multifunc , allVars)
+
+islandForPlotting <-melt(multifunc[,c(31,which(names(multifunc) %in% vars))], id.vars="Diversity",na.rm=T)
+islandForPlotting$variable <- factor(islandForPlotting$variable)
+levels(islandForPlotting$variable) <- c(	'totalshrubmass', 'totalmoss',  'RootBiomass', 'Pperarea',	'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode',  'TOPlitterbag' ,'AOAratio')
+islandFits <- dlply(islandForPlotting, .(variable), function(x) lm(value ~ Diversity, data=x))
+islandLabels <- data.frame(variable = levels(islandForPlotting$variable),   r2 = sapply(islandFits, function(x) summary(x)$r.squared), p = sapply(islandFits, function(x) anova(x)[1,5]))
+islandLabels$labels <- with(islandLabels, paste("p =", round(p,3),expression(R^2), "=", round(r2,2),   sep=" "))
+islandLabels$labels <- gsub("p = 0 ", "p < 0.001 ", islandLabels$labels)
+
+ggplot(na.omit(islandForPlotting), aes(x=Diversity, y=value)) +  geom_point(size=1)+  facet_wrap(~variable, scales="free") +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Value of Function\n") + theme(panel.grid = element_blank())
+
+#add on the new functions along with the averaged multifunctional index
+island <-cbind(multifunc , getStdAndMeanFunctions(multifunc , vars),na.rm=T)
+#island<-cbind(island, getStdAndMeanFunctions(island, vars, standardizeZScore))
+str(island )
+#write.table(island, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/MultifuncResultTotAllIslands.xls")
+
+#Multifunctionality All data
+
+island = read.table("MultifuncResultTotFGFinal.txt", header=T, sep="\t")
+str(island)
+
+#island = subset  (island, Size == "medium")
+
+
+#averaged multifunctionality
+ggplot(na.omit(island),aes(x=Diversity, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+
+#mydoc = pptx(  )
+#mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+#mydoc = addTitle( mydoc, "Plot examples" )
+#myplot = ggplot(na.omit(island),aes(x=Diversity, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+#mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+#writeDoc( mydoc, file = "test plot.pptx" )
+
+#reshape for plotting everything with ggplot2
+islandMeanForPlotting <-melt(island[,c(32,37:52)], id.vars="Diversity")
+str(islandMeanForPlotting  )
+
+#nice names for plotting
+levels(islandMeanForPlotting$variable) <- c('totalshrubmass','totalmoss', 'RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode', 'TOPlitterbag', 'AOAratio', 'Mean Multifunc')
+
+#Plot
+ggplot(na.omit(islandMeanForPlotting),aes(x=Diversity, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+
+#mydoc = pptx(  )
+#mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+#mydoc = addTitle( mydoc, "Plot examples" )
+#myplot = ggplot(na.omit(islandMeanForPlotting),aes(x=Diversity, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+#mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+#writeDoc( mydoc, file = "test plot.pptx" )
+
+
+### Distribution Data
+Hist_max_ggg <- ggplot(islandMeanForPlotting)+
+  geom_density(aes(x = value,y =..density.., colour = variable), position="identity")+
+  geom_vline(aes(xintercept = mean(value)), colour = "black", linetype = "dashed")+
+  scale_x_continuous(limits = c(0,1))+
+  theme_classic()+
+  theme(legend.position = "none")+
+  labs(x = "Scaled by maximum", y = "Density")
+
+Hist_max_ggg 
+
+write.table(islandMeanForPlotting, "C:/Users/nfanin/Dropbox/Sweden/Statistic/islandMeanForPlottingSS.xls")
+
+
+#statistical fit
+aveFit<-lm(meanFunction ~ Diversity, data=island, na=na.omit)
+Anova(aveFit)
+summary(aveFit)
+
+# Threshold Approach
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","Diversity","Size"), maxN=7)
+
+# 0.8 threshold data (example)
+mfuncislandLinear08<-glm(funcMaxed ~ Diversity, data=subset(islandThresh, islandThresh$thresholds=="0.8"), family=quasipoisson(link="identity"), na.action = na.omit,start=c(0.05,0.05))
+Anova(mfuncislandLinear08, test.statistic="F")
+summary(mfuncislandLinear08)
+
+# Threshold Approach GLMM All Size
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","Diversity", "Size", "Island"), maxN=7)
+#write.table(islandThresh, "C:/Users/nsfa0001/Dropbox/Sweden/Statistic/islandThreshSmallFG.xls")
+#islandThresh = read.table("islandThreshTotalFG.txt", header=T, sep="\t")
+#str(islandThresh)
+mfuncislandLinear08<-glmmPQL(funcMaxed ~ Size*Diversity, data=subset(islandThresh, islandThresh$thresholds=="0.85"), na.action = na.omit, family=quasipoisson(link="identity"), random=~1|Island, start=c(0.05,0.05,0.05,0.05,0.05,0.05))
+Anova(mfuncislandLinear08, test.statistic="F")
+
+
+# Number of functions > thresholds for 0.2, 0.4, 0.6, 0.8 
+gcPlot<-subset(islandThresh, islandThresh$thresholds %in% qw(0.2, 0.4, 0.6, 0.8)) #note, using qw as %in% is a string comparison operator
+gcPlot$percent<-paste(100*gcPlot$thresholds, "%", sep="")
+qplot(Diversity, funcMaxed, data=gcPlot, facets=~percent) +
+  stat_smooth(method="glm", method.args = list(family =quasipoisson(link="identity"),start=c(0.05,0.05)), colour="red", lwd=1.2) + 
+  ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+  geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), Diversity=2,funcMaxed=6), mapping=aes(x=Diversity, y=funcMaxed, label=lab))
+
+# mydoc = pptx(  )
+# mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+# mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = qplot(Diversity, funcMaxed, data=gcPlot, facets=~percent) +
+#   stat_smooth(method="glm", method.args = list(family =quasipoisson(link="identity"),start=c(0.05,0.05)), colour="red", lwd=1.2) + 
+#   ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+#   geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), Diversity=2,funcMaxed=6), mapping=aes(x=Diversity, y=funcMaxed, label=lab))
+# mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+# writeDoc( mydoc, file = "test plot.pptx" )
+
+
+#### Sensitivity Analysis
+islandThresh2<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Island","Diversity"), maxN=7)
+rawmods.sensitivity.df=ldply(c("0.2","0.4","0.6","0.8"),function(i) {
+  ldply(unique(islandThresh2$Island ),.progress="text",function(j) {
+    #Subset data
+    data=subset(islandThresh2, Island !=j & thresholds==i)
+    #Function to run models
+    f=function(x) glmmPQL(funcMaxed~Diversity,random=~Diversity|Island ,
+                          family=quasipoisson(link="identity"),
+                          control=lmeControl(opt="optim",msTol=1e-4),
+                          verbose=F,data=x)
+    #Run model, return NA if model fails
+    safef=failwith(NA,f)
+    mod=safef(data)
+    #Extract coefficient and standard error and return in data.frame
+    if(is.na(mod)) data.frame(Island.removed=j,thresholds=i,coef=NA,coef.se=NA) else
+      data.frame(
+        Island.removed=j,
+        thresholds=i,
+        coef=summary(mod)$tTable[2,1],
+        coef.se=summary(mod)$tTable[2,2] )
+  } )
+} )
+
+
+rawmods.sensitivity.df$Ref.removed=islandThresh2[match(rawmods.sensitivity.df$Island,islandThresh2$Island),"Island"]
+rawmods.sensitivity.df$thresholds=factor(rawmods.sensitivity.df$thresholds)
+levels(rawmods.sensitivity.df$thresholds)=c("20%","40%","60%","80%")
+
+rawmods.list=dlply(islandThresh2,"thresholds",.progress="text",function(i) {
+  #Set lmeControl for certain thresholdss
+  if(i$thresholds %in% c(0.02,0.99)) control=lmeControl(opt="optim",msTol=1e-6) else
+    control=lmeControl(opt="optim")
+  #Function to run models
+  f=function(x) glmmPQL(funcMaxed~Diversity,random=~Diversity|Island ,
+                        family=quasipoisson(link="identity"),
+                        control=control,
+                        verbose=F,data=x)
+  #Run model, return NA if model fails
+  safef=failwith(NA,f)
+  safef(i)
+} )
+
+#Plot results: 12" x 8"
+yep= ggplot(rawmods.sensitivity.df,aes(y=coef,x=Ref.removed,col=Ref.removed))+
+  geom_hline(data=data.frame(
+    thresholds=c("20%","40%","60%","80%"),
+    coef=c(summary(rawmods.list[[20]])$tTable[2,1],
+           summary(rawmods.list[[40]])$tTable[2,1],
+           summary(rawmods.list[[60]])$tTable[2,1],
+           summary(rawmods.list[[80]])$tTable[2,1]) ),
+    aes(yintercept=coef),lwd=1,alpha=0.6,lty=1)+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymax=coef+2*coef.se,ymin=coef-2*coef.se))+
+  coord_flip()+
+  facet_wrap(~thresholds,nrow=1)+
+  labs(y="Regression coefficient",x="Island removed")+
+  theme_bw(base_size=12)+
+  theme(legend.position="none",panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+yep
+
+
+# mydoc = pptx(  )
+# mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+# mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = ggplot(rawmods.sensitivity.df,aes(y=coef,x=Ref.removed,col=Ref.removed))+  geom_hline(data=data.frame(thresholds=c("20%","40%","60%","80%"), coef=c(summary(rawmods.list[[20]])$tTable[2,1], summary(rawmods.list[[40]])$tTable[2,1], summary(rawmods.list[[60]])$tTable[2,1], summary(rawmods.list[[80]])$tTable[2,1]) ), aes(yintercept=coef),lwd=1,alpha=0.6,lty=1)+  geom_point(size=3)+  geom_errorbar(aes(ymax=coef+2*coef.se,ymin=coef-2*coef.se))+  coord_flip()+  facet_wrap(~thresholds,nrow=1)+  labs(y="Regression coefficient",x="Island removed")+  theme_bw(base_size=12)+  theme(legend.position="none",panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+# mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+# writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Entire spread of Thresholds
+islandThresh$percent <- 100*islandThresh$thresholds
+ggplot(na.omit(islandThresh), aes(x=Diversity, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+  stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+  scale_color_gradient(name="Percent of \nMaximum",low="lightgreen",high="darkgreen")
+
+# mydoc = pptx(  )
+# mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+# mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = ggplot(na.omit(islandThresh), aes(x=Diversity, y=funcMaxed, group=percent)) +
+#   ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+#   stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+#   scale_color_gradient(name="Percent of \nMaximum",low="orange",high="red")
+# mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+# writeDoc( mydoc, file = "test plot.pptx" )
+
+# Multiple Threshold Approach
+islandLinearSlopes<-getCoefTab(funcMaxed ~ Diversity, data=islandThresh, coefVar="Diversity")
+islandSlopes <- ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) + 
+  geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) + 
+  geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+islandSlopes
+
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) + geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) +   geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Indices 
+islandIDX <- getIndices(islandLinearSlopes, islandThresh, funcMaxed ~ Diversity)
+islandIDX
+
+# Tmde
+islandLinearSlopes$Estimate[which(islandLinearSlopes$thresholds==islandIDX$Tmde)]
+
+islandThresh$IDX <- 0
+islandThresh$IDX [which(islandThresh$thresholds %in%c(islandIDX$Tmin, islandIDX$Tmax,islandIDX$Tmde))] <- 1
+ggplot(data=islandThresh, aes(x=Diversity, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) +
+  xlab("Species Richness") +  geom_smooth(method="glm", fill=NA, aes(color=percent, lwd=IDX)) +  theme_bw(base_size=14) +  scale_color_gradient(name="Percent of \nMaximum", low="blue", high="red") +
+  scale_size(range=c(0.3,5), guide="none") +  annotate(geom="text", x=0, y=c(0.2,2,4.6), label=c("Tmax", "Tmde", "Tmin")) +  annotate(geom="text", x=16.7, y=c(islandIDX$Mmin, islandIDX$Mmax,islandIDX$Mmde), label=c("Mmin", "Mmax", "Mmde"))
+
+islandSlopes + annotate(geom="text", y=c(-0.01, -0.01, -0.01, islandIDX$Rmde.linear+0.02), x=c(islandIDX$Tmin*100, islandIDX$Tmde*100,
+                                                                                               islandIDX$Tmax*100, islandIDX$Tmde*100), label=c("Tmin", "Tmde", "Tmax","Rmde"), color="black")
+
+#################################################  
+################  Multifunc ERI #################
+#################################################
+
+library(devtools)
+#install_github("multifunc", username="jebyrnes", args='-l "C:/Program Files/R/R-3.2.4revised/library"')
+library(multifunc)
+library(ggplot2)
+library(gridExtra)
+library(colorRamps)
+
+multifunc = read.table("MultifuncFG.txt", header=T, sep="\t")
+str(multifunc)
+
+multifunc = subset  (multifunc, Size =="medium")
+
+multifunc [,9]=as.numeric(multifunc [,9])
+multifunc [,10]=as.numeric(multifunc [,10])
+multifunc [,11]=as.numeric(multifunc [,11])
+
+allVars <-qw(totalshrubmass,  RootBiomass, Pperarea,	Nperarea,	Cperarea,	minN,	minP,	resinPO4,	resinminN,	SIR,	TotalPLFA,	Nematode,TOPlitterbag,AOAratio)
+varIdx <-which(names(multifunc ) %in% allVars)
+vars <-whichVars(multifunc , allVars)
+
+islandForPlotting <-melt(multifunc[,c(32,which(names(multifunc) %in% vars))], id.vars="ERIDiv",na.rm=T)
+islandForPlotting$variable <- factor(islandForPlotting$variable)
+levels(islandForPlotting$variable) <- c('totalshrubmass','RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode',  'TOPlitterbag','AOAratio')
+islandFits <- dlply(islandForPlotting, .(variable), function(x) lm(value ~ ERIDiv, data=x))
+islandLabels <- data.frame(variable = levels(islandForPlotting$variable),   r2 = sapply(islandFits, function(x) summary(x)$r.squared), p = sapply(islandFits, function(x) anova(x)[1,5]))
+islandLabels$labels <- with(islandLabels, paste("p =", round(p,3),expression(R^2), "=", round(r2,2),   sep=" "))
+islandLabels$labels <- gsub("p = 0 ", "p < 0.001 ", islandLabels$labels)
+
+ggplot(na.omit(islandForPlotting), aes(x=ERIDiv, y=value)) +  geom_point(size=1)+  facet_wrap(~variable, scales="free") +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Value of Function\n") + theme(panel.grid = element_blank())
+
+#add on the new functions along with the averaged multifunctional index
+island <-cbind(multifunc , getStdAndMeanFunctions(multifunc , vars),na.rm=T)
+#island<-cbind(island, getStdAndMeanFunctions(island, vars, standardizeZScore))
+str(island )
+
+#averaged multifunctionality
+ggplot(na.omit(island),aes(x=ERIDiv, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(na.omit(island),aes(x=ERIDiv, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+#reshape for plotting everything with ggplot2
+islandMeanForPlotting <-melt(island[,c(32,36:50)], id.vars="ERIDiv")
+str(islandMeanForPlotting  )
+
+#nice names for plotting
+levels(islandMeanForPlotting$variable) <- c('totalshrubmass','RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode',  'TOPlitterbag','AOAratio', 'Mean Multifunc')
+#Plot
+ggplot(na.omit(islandMeanForPlotting),aes(x=ERIDiv, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+
+
+#statistical fit
+aveFit<-lm(meanFunction ~ ERIDiv, data=island, na=na.omit)
+Anova(aveFit)
+summary(aveFit)
+
+# Threshold Approach
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","ERIDiv"), maxN=7)
+
+# 0.8 threshold data (example)
+mfuncislandLinear08<-glm(funcMaxed ~ ERIDiv, data=subset(islandThresh, islandThresh$thresholds=="0.8"), na.action = na.omit)
+Anova(mfuncislandLinear08, test.statistic="F")
+summary(mfuncislandLinear08)
+
+# Number of functions > thresholds for 0.2, 0.4, 0.6, 0.8 
+gcPlot<-subset(islandThresh, islandThresh$thresholds %in% qw(0.2, 0.4, 0.6, 0.8)) #note, using qw as %in% is a string comparison operator
+gcPlot$percent<-paste(100*gcPlot$thresholds, "%", sep="")
+qplot(ERIDiv, funcMaxed, data=gcPlot, facets=~percent) +
+  stat_smooth(method="glm",colour="red", lwd=1.2) +
+  ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+  geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), Diversity=2,funcMaxed=6), mapping=aes(x=Diversity, y=funcMaxed, label=lab))
+
+# Entire spread of Thresholds
+islandThresh$percent <- 100*islandThresh$thresholds
+ggplot(na.omit(islandThresh), aes(x=ERIDiv, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+  stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+  scale_color_gradient(name="Percent of \nMaximum",low="lightblue",high="darkblue")
+
+# Multiple Threshold Approach
+islandLinearSlopes<-getCoefTab(funcMaxed ~ ERIDiv, data=islandThresh, coefVar="ERIDiv")
+islandSlopes <- ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) +  geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) +  geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+islandSlopes
+
+# Indices 
+islandIDX <- getIndices(islandLinearSlopes, islandThresh, funcMaxed ~ ERIDiv)
+islandIDX
+
+# Tmde
+islandLinearSlopes$Estimate[which(islandLinearSlopes$thresholds==islandIDX$Tmde)]
+
+islandThresh$IDX <- 0
+islandThresh$IDX [which(islandThresh$thresholds %in%c(islandIDX$Tmin, islandIDX$Tmax,islandIDX$Tmde))] <- 1
+ggplot(data=islandThresh, aes(x=ERIDiv, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) +
+  xlab("Species Richness") +  geom_smooth(method="glm", method.args = list(family =quasipoisson(link="identity")), fill=NA, aes(color=percent, lwd=IDX)) +  theme_bw(base_size=14) +  scale_color_gradient(name="Percent of \nMaximum", low="blue", high="red") +
+  scale_size(range=c(0.3,5), guide="none") +  annotate(geom="text", x=0, y=c(0.2,2,4.6), label=c("Tmax", "Tmde", "Tmin")) +  annotate(geom="text", x=16.7, y=c(islandIDX$Mmin, islandIDX$Mmax,islandIDX$Mmde), label=c("Mmin", "Mmax", "Mmde"))
+
+islandSlopes + annotate(geom="text", y=c(-0.01, -0.01, -0.01, islandIDX$Rmde.linear+0.02), x=c(islandIDX$Tmin*100, islandIDX$Tmde*100,
+                                                                                               islandIDX$Tmax*100, islandIDX$Tmde*100), label=c("Tmin", "Tmde", "Tmax","Rmde"), color="black")
+
+#################################################  
+################  Multifunc ECM #################
+#################################################
+
+library(devtools)
+#install_github("multifunc", username="jebyrnes", args='-l "C:/Program Files/R/R-3.2.4revised/library"')
+library(multifunc)
+library(ggplot2)
+library(gridExtra)
+library(colorRamps)
+
+multifunc = read.table("MultifuncFG.txt", header=T, sep="\t")
+str(multifunc)
+
+multifunc = subset  (multifunc, Size =="small")
+
+multifunc [,9]=as.numeric(multifunc [,9])
+multifunc [,10]=as.numeric(multifunc [,10])
+multifunc [,11]=as.numeric(multifunc [,11])
+
+allVars <-qw(totalshrubmass,  RootBiomass, Pperarea,	Nperarea,	Cperarea,	minN,	minP,	resinPO4,	resinminN,	SIR,	TotalPLFA,	Nematode, TOPlitterbag,AOAratio)
+varIdx <-which(names(multifunc ) %in% allVars)
+vars <-whichVars(multifunc , allVars)
+
+islandForPlotting <-melt(multifunc[,c(33,which(names(multifunc) %in% vars))], id.vars="ECMDiv",na.rm=T)
+islandForPlotting$variable <- factor(islandForPlotting$variable)
+levels(islandForPlotting$variable) <- c(	'totalshrubmass','RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode','TOPlitterbag','AOAratio')
+islandLabels <- data.frame(variable = levels(islandForPlotting$variable),   r2 = sapply(islandFits, function(x) summary(x)$r.squared), p = sapply(islandFits, function(x) anova(x)[1,5]))
+islandLabels$labels <- with(islandLabels, paste("p =", round(p,3),expression(R^2), "=", round(r2,2),   sep=" "))
+islandLabels$labels <- gsub("p = 0 ", "p < 0.001 ", islandLabels$labels)
+
+ggplot(na.omit(islandForPlotting), aes(x=ECMDiv, y=value)) +  geom_point(size=1)+  facet_wrap(~variable, scales="free") +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Value of Function\n") + theme(panel.grid = element_blank())
+
+#add on the new functions along with the averaged multifunctional index
+island <-cbind(multifunc , getStdAndMeanFunctions(multifunc , vars),na.rm=T)
+#island<-cbind(island, getStdAndMeanFunctions(island, vars, standardizeZScore))
+str(island )
+
+#averaged multifunctionality
+ggplot(na.omit(island),aes(x=ECMDiv, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+
+#reshape for plotting everything with ggplot2
+islandMeanForPlotting <-melt(island[,c(33,36:50)], id.vars="ECMDiv")
+str(islandMeanForPlotting  )
+
+#nice names for plotting
+levels(islandMeanForPlotting$variable) <- c('totalshrubmass','RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode', 'TOPlitterbag','AOAratio', 'Mean Multifunc')
+#Plot
+ggplot(na.omit(islandMeanForPlotting),aes(x=ECMDiv, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(na.omit(islandMeanForPlotting),aes(x=ECMDiv, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+
+#statistical fit
+aveFit<-lm(meanFunction ~ ECMDiv, data=island, na=na.omit)
+Anova(aveFit)
+summary(aveFit)
+
+# Threshold Approach
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","ECMDiv"), maxN=7)
+
+# 0.8 threshold data (example)
+mfuncislandLinear08<-glm(funcMaxed ~ ECMDiv, data=subset(islandThresh, islandThresh$thresholds=="0.8"), na.action = na.omit)
+Anova(mfuncislandLinear08, test.statistic="F")
+summary(mfuncislandLinear08)
+
+# Number of functions > thresholds for 0.2, 0.4, 0.6, 0.8 
+gcPlot<-subset(islandThresh, islandThresh$thresholds %in% qw(0.2, 0.4, 0.6, 0.8)) #note, using qw as %in% is a string comparison operator
+gcPlot$percent<-paste(100*gcPlot$thresholds, "%", sep="")
+qplot(ECMDiv, funcMaxed, data=gcPlot, facets=~percent) +
+  stat_smooth(method="glm",colour="red", lwd=1.2) +
+  ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+  geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), Diversity=2,funcMaxed=6), mapping=aes(x=Diversity, y=funcMaxed, label=lab))
+
+# Entire spread of Thresholds
+islandThresh$percent <- 100*islandThresh$thresholds
+ggplot(na.omit(islandThresh), aes(x=ECMDiv, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+  stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+  scale_color_gradient(name="Percent of \nMaximum",low="lightblue",high="darkblue")
+
+# Multiple Threshold Approach
+islandLinearSlopes<-getCoefTab(funcMaxed ~ ECMDiv, data=islandThresh, coefVar="ECMDiv")
+islandSlopes <- ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) +  geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) +  geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+islandSlopes
+
+# Indices 
+islandIDX <- getIndices(islandLinearSlopes, islandThresh, funcMaxed ~ ECMDiv)
+islandIDX
+
+# Tmde
+islandLinearSlopes$Estimate[which(islandLinearSlopes$thresholds==islandIDX$Tmde)]
+
+islandThresh$IDX <- 0
+islandThresh$IDX [which(islandThresh$thresholds %in%c(islandIDX$Tmin, islandIDX$Tmax,islandIDX$Tmde))] <- 1
+ggplot(data=islandThresh, aes(x=ECMDiv, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) +
+  xlab("Species Richness") +  geom_smooth(method="glm", method.args = list(family =quasipoisson(link="identity")), fill=NA, aes(color=percent, lwd=IDX)) +  theme_bw(base_size=14) +  scale_color_gradient(name="Percent of \nMaximum", low="blue", high="red") +
+  scale_size(range=c(0.3,5), guide="none") +  annotate(geom="text", x=0, y=c(0.2,2,4.6), label=c("Tmax", "Tmde", "Tmin")) +  annotate(geom="text", x=16.7, y=c(islandIDX$Mmin, islandIDX$Mmax,islandIDX$Mmde), label=c("Mmin", "Mmax", "Mmde"))
+
+islandSlopes + annotate(geom="text", y=c(-0.01, -0.01, -0.01, islandIDX$Rmde.linear+0.02), x=c(islandIDX$Tmin*100, islandIDX$Tmde*100,
+                                                                                               islandIDX$Tmax*100, islandIDX$Tmde*100), label=c("Tmin", "Tmde", "Tmax","Rmde"), color="black")
+
+
+
+#######################################################  
+##################  Multifunc  plant ##################
+#######################################################
+
+library(devtools)
+#install_github("multifunc", username="jebyrnes", args='-l "C:/Program Files/R/R-3.2.4revised/library"')
+library(multifunc)
+library(ggplot2)
+library(gridExtra)
+library(colorRamps)
+library(ReporteRs)
+library(reshape)
+
+multifunc = read.table("MultifuncFGFinal.txt", header=T, sep="\t")
+str(multifunc)
+
+multifunc = subset  (multifunc, Size == "medium")
+
+allVars <-qw(totalshrubmass, totalmoss, RootBiomass, Pperarea,	Nperarea,	Cperarea,	minN,	minP,	resinPO4,	resinminN,	SIR,	TotalPLFA,	Nematode, TOPlitterbag,AOAratio)
+varIdx <-which(names(multifunc ) %in% allVars)
+vars <-whichVars(multifunc , allVars)
+
+islandForPlotting <-melt(multifunc[,c(35,which(names(multifunc) %in% vars))], id.vars="PlantGroup")
+islandForPlotting$variable <- factor(islandForPlotting$variable)
+levels(islandForPlotting$variable) <- c('totalshrubmass', 'totalmoss', 'RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode', 'TOPlitterbag','AOAratio')
+islandFits <- dlply(islandForPlotting, .(variable), function(x) lm(value ~ PlantGroup, data=x))
+islandLabels <- data.frame(variable = levels(islandForPlotting$variable),   r2 = sapply(islandFits, function(x) summary(x)$r.squared), p = sapply(islandFits, function(x) anova(x)[1,5]))
+islandLabels$labels <- with(islandLabels, paste("p =", round(p,3),expression(R^2), "=", round(r2,2),   sep=" "))
+islandLabels$labels <- gsub("p = 0 ", "p < 0.001 ", islandLabels$labels)
+
+ggplot(na.omit(islandForPlotting), aes(x=PlantGroup, y=value)) +  geom_point(size=1)+  facet_wrap(~variable, scales="free") +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Value of Function\n") + theme(panel.grid = element_blank())
+
+#add on the new functions along with the averaged multifunctional index
+island <-cbind(multifunc , getStdAndMeanFunctions(multifunc , vars),na.rm=T)
+#island<-cbind(island, getStdAndMeanFunctions(island, vars, standardizeZScore))
+str(island )
+#write.table(island, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/MultifuncResultFINALmedium.xls")
+
+#Multifunctionality All data
+
+island = read.table("MultifuncResultTotFGFinal.txt", header=T, sep="\t")
+#str(island)
+island = subset  (island , Size == "small")
+
+#averaged multifunctionality
+#ggplot(na.omit(island),aes(x=PlantGroup, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+ggplot(na.omit(island),aes(x=PlantGroup, y=meanFunction, colour = factor(Size)))+geom_point(size=3)+ 
+  theme_bw(base_size=15)+ geom_smooth(method=lm, aes(fill=Size))+   xlab("\nSpecies Richness") + 
+  ylab("Average Value of Standardized Functions\n")+ scale_color_manual(values=c('#CC0000','#0099FF', '#33CC66')) +
+  scale_fill_manual(values=c('#CC0000','#0099FF', '#33CC33'))
+
+#mydoc = pptx(  )
+#mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+#mydoc = addTitle( mydoc, "Plot examples" )
+#myplot = ggplot(na.omit(island),aes(x=PlantGroup, y=meanFunction))+geom_point(size=3)+  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Average Value of Standardized Functions\n")
+#mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+#writeDoc( mydoc, file = "test plot.pptx" )
+
+#reshape for plotting everything with ggplot2
+islandMeanForPlotting <-melt(island[,c(36,37:52)], id.vars="PlantGroup")
+str(islandMeanForPlotting  )
+
+#nice names for plotting
+levels(islandMeanForPlotting$variable) <- c('totalshrubmass','totalmoss','RootBiomass', 'Pperarea',  'Nperarea',	'Cperarea',	'minN',	'minP',	'resinPO4',	'resinminN',	'SIR',	'TotalPLFA',	'Nematode', 'TOPlitterbag','AOAratio', 'Mean Multifunc')
+#Plot
+ggplot(na.omit(islandMeanForPlotting),aes(x=PlantGroup, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(na.omit(islandMeanForPlotting),aes(x=PlantGroup, y=value)) +geom_point(size=3)+  facet_grid(~variable) +  theme_bw(base_size=15)+  stat_smooth(method="lm", colour="black", size=2) +   xlab("\nSpecies Richness") +  ylab("Standardized Value of Function\n")
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+
+#statistical fit
+aveFit<-lm(meanFunction ~ Size *PlantGroup, data=island, na=na.omit)
+Anova(aveFit)
+summary(aveFit)
+aveFit2<-lme(meanFunction ~ Size * PlantGroup, random = ~1|Island, data=island, na=na.omit)
+anova(aveFit2)
+
+# Threshold Approach
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","PlantGroup"), maxN=7)
+
+# 0.8 threshold data (example)
+mfuncislandLinear08<-glm(funcMaxed ~ PlantGroup, data=subset(islandThresh, islandThresh$thresholds=="0.1"), family=quasipoisson(link="identity"), na.action = na.omit,start=c(0.05,0.05))
+Anova(mfuncislandLinear08, test.statistic="F")
+summary(mfuncislandLinear08)
+
+# Threshold Approach GLMM All Size
+
+#write.table(islandThresh, "C:/Users/Nicolas/Dropbox/Sweden/Statistic/islandThreshPlantLargeFG.xls")
+#islandThresh = read.table("islandThreshPlantTotalFG.txt", header=T, sep="\t")
+#str(islandThresh), data=subset(islandThresh, islandThresh$thresholds=="0.4"), na.action = na.omit, family=quasipoisson(link="identity"), random=~1|Island, start=c(0.05,0.05,0.05,0.05,0.05,0.05))
+islandThresh<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Name","PlantGroup", "Size", "Island"), maxN=7)
+mfuncislandLinear08<-glmmPQL(funcMaxed ~ Size*PlantGroup, data=subset(islandThresh, islandThresh$thresholds=="0.1"), na.action = na.omit, family=quasipoisson(link="identity"), random=~1|Island, start=c(0.05,0.05,0.05,0.05,0.05,0.05))
+Anova(mfuncislandLinear08, test.statistic="F")
+
+
+
+
+#### Sensitivity Analysis
+islandThresh2<-getFuncsMaxed(na.omit(island), vars, threshmin=0.05, threshmax=0.99, prepend=c("Island","PlantGroup"), maxN=7)
+rawmods.sensitivity.df=ldply(c("0.2","0.4","0.6","0.8"),function(i) {
+  ldply(unique(islandThresh2$Island ),.progress="text",function(j) {
+    #Subset data
+    data=subset(islandThresh2, Island !=j & thresholds==i)
+    #Function to run models
+    f=function(x) glmmPQL(funcMaxed~PlantGroup,random=~1|Island ,
+                          family=quasipoisson(link="identity"),
+                          control=lmeControl(opt="optim",msTol=1e-4),
+                          verbose=F,data=x)
+    #Run model, return NA if model fails
+    safef=failwith(NA,f)
+    mod=safef(data)
+    #Extract coefficient and standard error and return in data.frame
+    if(is.na(mod)) data.frame(Island.removed=j,thresholds=i,coef=NA,coef.se=NA) else
+      data.frame(
+        Island.removed=j,
+        thresholds=i,
+        coef=summary(mod)$tTable[2,1],
+        coef.se=summary(mod)$tTable[2,2] )
+  } )
+} )
+
+
+rawmods.sensitivity.df$Ref.removed=islandThresh2[match(rawmods.sensitivity.df$Island,islandThresh2$Island),"Island"]
+rawmods.sensitivity.df$thresholds=factor(rawmods.sensitivity.df$thresholds)
+levels(rawmods.sensitivity.df$thresholds)=c("20%","40%","60%","80%")
+
+rawmods.list=dlply(islandThresh2,"thresholds",.progress="text",function(i) {
+  #Set lmeControl for certain thresholdss
+  if(i$thresholds %in% c(0.05,0.99)) control=lmeControl(opt="optim",msTol=1e-6) else
+    control=lmeControl(opt="optim")
+  #Function to run models
+  f=function(x) glmmPQL(funcMaxed~PlantGroup,random=~1|Island ,
+                        family=quasipoisson(link="identity"),
+                        control=control,
+                        verbose=F,data=x)
+  #Run model, return NA if model fails
+  safef=failwith(NA,f)
+  safef(i)
+} )
+
+#Plot results: 12" x 8"
+yep= ggplot(rawmods.sensitivity.df,aes(y=coef,x=Ref.removed,col=Ref.removed))+
+  geom_hline(data=data.frame(
+    thresholds=c("20%","40%","60%","80%"),
+    coef=c(summary(rawmods.list[[20]])$tTable[2,1],
+           summary(rawmods.list[[40]])$tTable[2,1],
+           summary(rawmods.list[[60]])$tTable[2,1],
+           summary(rawmods.list[[81]])$tTable[2,1]) ),
+    aes(yintercept=coef),lwd=1,alpha=0.6,lty=1)+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymax=coef+2*coef.se,ymin=coef-2*coef.se))+
+  coord_flip()+
+  facet_wrap(~thresholds,nrow=1)+
+  labs(y="Regression coefficient",x="Island removed")+
+  theme_bw(base_size=12)+
+  theme(legend.position="none",panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+yep
+
+
+
+# mydoc = pptx(  )
+# mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+# mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = ggplot(rawmods.sensitivity.df,aes(y=coef,x=Ref.removed,col=Ref.removed))+  geom_hline(data=data.frame(thresholds=c("20%","40%","60%","80%"), coef=c(summary(rawmods.list[[20]])$tTable[2,1], summary(rawmods.list[[40]])$tTable[2,1], summary(rawmods.list[[60]])$tTable[2,1], summary(rawmods.list[[81]])$tTable[2,1]) ), aes(yintercept=coef),lwd=1,alpha=0.6,lty=1)+  geom_point(size=3)+  geom_errorbar(aes(ymax=coef+2*coef.se,ymin=coef-2*coef.se))+  coord_flip()+  facet_wrap(~thresholds,nrow=1)+  labs(y="Regression coefficient",x="Island removed")+  theme_bw(base_size=12)+  theme(legend.position="none",panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+# mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+# writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Number of functions > thresholds for 0.2, 0.4, 0.6, 0.8 
+gcPlot<-subset(islandThresh, islandThresh$thresholds %in% qw(0.2, 0.4, 0.6, 0.8)) #note, using qw as %in% is a string comparison operator
+gcPlot$percent<-paste(100*gcPlot$thresholds, "%", sep="")
+qplot(PlantGroup, funcMaxed, data=gcPlot, facets=~percent) +
+  stat_smooth(method="glm", method.args = list(family =quasipoisson(link="identity")),colour="red", lwd=1.2) +
+  ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+  geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), PlantGroup=2,funcMaxed=6), mapping=aes(x=PlantGroup, y=funcMaxed, label=lab))
+
+
+# mydoc = pptx(  )
+# mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+# mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = qplot(PlantGroup, funcMaxed, data=gcPlot, facets=~percent) +
+#  stat_smooth(method="glm", method.args = list(family =quasipoisson(link="identity")),colour="red", lwd=1.2) +
+#  ylab(expression("Number of Functions" >= Threshold)) +  xlab("Species Richness") +  theme_bw(base_size=14) +
+#  geom_text(data=data.frame(percent = unique(gcPlot$percent), lab = paste(letters[1:4], ")", sep=""), PlantGroup=2,funcMaxed=6), mapping=aes(x=PlantGroup, y=funcMaxed, label=lab))
+# mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+# writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Entire spread of Thresholds
+islandThresh$percent <- 100*islandThresh$thresholds
+ggplot(na.omit(islandThresh), aes(x=PlantGroup, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+  stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+  scale_color_gradient(name="Percent of \nMaximum",low="lightgreen",high="darkgreen")
+
+
+#  mydoc = pptx(  )
+#  mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+#  mydoc = addTitle( mydoc, "Plot examples" )
+# myplot = ggplot(na.omit(islandThresh), aes(x=PlantGroup, y=funcMaxed, group=percent)) +
+#    ylab(expression("Number of Functions" >= Threshold)) + xlab("Species Richness") + 
+#    stat_smooth(method="glm", lwd=0.8, fill=NA, aes(color=percent))+theme_bw(base_size=16) +
+#    scale_color_gradient(name="Percent of \nMaximum",low="lightblue",high="darkblue")
+#  mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+#  writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Multiple Threshold Approach
+islandLinearSlopes<-getCoefTab(funcMaxed ~ PlantGroup, data=islandThresh, coefVar="PlantGroup")
+islandSlopes <- ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) + 
+  geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) + 
+  geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+islandSlopes
+
+mydoc = pptx(  )
+mydoc = addSlide( mydoc, slide.layout = "Title and Content" )
+mydoc = addTitle( mydoc, "Plot examples" )
+myplot = ggplot(na.omit(islandLinearSlopes), aes(x=thresholds)) + 
+  geom_ribbon(fill="grey50", aes(x=thresholds*100, ymin=Estimate-1.96*islandLinearSlopes[["Std. Error"]], ymax=Estimate+1.96*islandLinearSlopes[["Std. Error"]])) + 
+  geom_point(aes(x=thresholds*100, y=Estimate)) + ylab("Change in Number of Functions per Addition of 1 Species\n") +  xlab("\nThreshold (%)") + theme_bw(base_size=14)
+mydoc = addPlot( mydoc, function( ) print( myplot ), vector.graphic=TRUE) 
+writeDoc( mydoc, file = "test plot.pptx" )
+
+
+# Indices 
+islandIDX <- getIndices(islandLinearSlopes, islandThresh, funcMaxed ~ PlantGroup)
+islandIDX
+
+# Tmde
+islandLinearSlopes$Estimate[which(islandLinearSlopes$thresholds==islandIDX$Tmde)]
+
+islandThresh$IDX <- 0
+islandThresh$IDX [which(islandThresh$thresholds %in%c(islandIDX$Tmin, islandIDX$Tmax,islandIDX$Tmde))] <- 1
+ggplot(data=islandThresh, aes(x=PlantGroup, y=funcMaxed, group=percent)) +
+  ylab(expression("Number of Functions" >= Threshold)) +
+  xlab("Species Richness") +  geom_smooth(method="glm", fill=NA, aes(color=percent, lwd=IDX)) +  theme_bw(base_size=14) +  scale_color_gradient(name="Percent of \nMaximum", low="blue", high="red") +
+  scale_size(range=c(0.3,5), guide="none") +  annotate(geom="text", x=0, y=c(0.2,2,4.6), label=c("Tmax", "Tmde", "Tmin")) +  annotate(geom="text", x=16.7, y=c(islandIDX$Mmin, islandIDX$Mmax,islandIDX$Mmde), label=c("Mmin", "Mmax", "Mmde"))
+
+islandSlopes + annotate(geom="text", y=c(-0.01, -0.01, -0.01, islandIDX$Rmde.linear+0.02), x=c(islandIDX$Tmin*100, islandIDX$Tmde*100,
+                                                                                               islandIDX$Tmax*100, islandIDX$Tmde*100), label=c("Tmin", "Tmde", "Tmax","Rmde"), color="black")
+islandIDX$Tmax*100, islandIDX$Tmde*100), label=c("Tmin", "Tmde", "Tmax","Rmde"), color="black")
+
+
+
+#################################################  
+###############  3D PROP FUNG  ##################
+#################################################
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+str(EnvFG3D)
+library(scatterplot3d) 
+library(car) 
+
+
+scatter3d(ERI~ECM+SAP|schrubrem, data=EnvFG3D, surface.col = c("blue", "red"), surface=TRUE, residuals=TRUE, parallel=FALSE, bg="white", axis.scales=TRUE, grid=FALSE,  ellipsoid=FALSE)
+scatter3d(ERI~ECM+SAP|treerem, data=EnvFG3D, surface.col = c("blue", "red"), surface=TRUE, residuals=TRUE, parallel=FALSE, bg="white", axis.scales=TRUE, grid=FALSE,  ellipsoid=FALSE)
+
+
+attach(EnvFG3D)
+colors <- c("blue", "red")
+colors <- colors[as.numeric(EnvFG3D$treerem)]
+s3d = scatterplot3d(ECM, SAP, ERI, pch=16, color = colors,  type="h")
+my.lm <- lm(ERI~ ECM+ SAP)
+s3d$plane3d(my.lm)
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+EnvFG3Dno  = subset  (EnvFG3D , schrubrem == "no")
+attach(EnvFG3Dno)
+s3d = scatterplot3d(EnvFG3Dno$ECM, EnvFG3Dno$SAP, EnvFG3Dno$ERI, pch=16,   type="h")
+my.lm <- lm(EnvFG3Dno$ERI~ EnvFG3Dno$ECM+ EnvFG3Dno$SAP)
+s3d$plane3d(my.lm)
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+EnvFG3Dyes = subset  (EnvFG3D , schrubrem == "yes")
+attach(EnvFG3Dyes)
+str(EnvFG3Dyes)
+colors <- c("red")
+s3d = scatterplot3d(EnvFG3Dyes$ECM, EnvFG3Dyes$SAP, EnvFG3Dyes$ERI, pch=16, color = colors,  type="h")
+my.lm <- lm(EnvFG3Dyes$ERI~ EnvFG3Dyes$ECM+ EnvFG3Dyes$SAP)
+s3d$plane3d(my.lm)
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+EnvFG3Dno  = subset  (EnvFG3D , treerem == "no")
+attach(EnvFG3Dno)
+s3d = scatterplot3d(EnvFG3Dno$ECM, EnvFG3Dno$SAP, EnvFG3Dno$ERI, pch=16,   type="h")
+my.lm <- lm(EnvFG3Dno$ERI~ EnvFG3Dno$ECM+ EnvFG3Dno$SAP)
+s3d$plane3d(my.lm)
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+EnvFG3Dyes = subset  (EnvFG3D , treerem == "yes")
+attach(EnvFG3Dyes)
+str(EnvFG3Dyes)
+colors <- c("red")
+s3d = scatterplot3d(EnvFG3Dyes$ECM, EnvFG3Dyes$SAP, EnvFG3Dyes$ERI, xlim=c(0,30), ylim=c(0,50), pch=16,color = colors,    type="h")
+my.lm <- lm(EnvFG3Dyes$ERI~ EnvFG3Dyes$ECM+ EnvFG3Dyes$SAP)
+s3d$plane3d(my.lm)
+
+#Different Vision
+cloud(EnvFG3Dyes$ERI~ EnvFG3Dyes$ECM+ EnvFG3Dyes$SAP, data = EnvFG3Dyes, pch= 19, col.point = EnvFG3Dyes$Size,    key = list(points = list(pch = 19, col = seq_along(levels(EnvFG3Dyes$Size))),                  text = list(levels(EnvFG3Dyes$Size)), space = 'top', columns = nlevels(EnvFG3Dyes$Size)))
+
+
+
+
+EnvFG3D = read.table("GroupRelFGNA.txt", header=T, sep="\t")
+EnvFG3Dyes = subset  (EnvFG3D , treerem == "yes")
+attach(EnvFG3Dyes)
+str(EnvFG3Dyes)
+colors <- c("red", "blue", "green")
+colors<- colors [as.numeric(EnvFG3Dyes$Size)]
+s3d = scatterplot3d(EnvFG3Dyes$ECM, EnvFG3Dyes$SAP, EnvFG3Dyes$ERI, pch=16, color =colors,  type="h")
+my.lm <- lm(EnvFG3Dyes$ERI~ EnvFG3Dyes$ECM+ EnvFG3Dyes$SAP)
+s3d$plane3d(my.lm)
+
+
+
+
+
+
+
+
+
+
+#################################################  
+###############  RandomForest  ##################
+#################################################
+
+library(party)
+library(randomForest)
+library(MASS)
+
+multifunc = read.table("RandomForestFG.txt", header=T, sep="\t")
+multifunc [,3]=as.factor(multifunc [,3])
+multifunc [,4]=as.factor(multifunc [,4])
+str(multifunc)
+multifunc=na.omit(multifunc)
+multifunc=multifunc [,1:8]
+
+fgl.rf <- randomForest(Multifunc ~ ., data = multifunc, ntree=5000, mtry = 2, importance = TRUE, do.trace = 100, na.action=na.omit)
+print(fgl.rf)
+table(predict(fgl.rf))
+print(fgl.rf)
+
+importance(fgl.rf)
+varImpPlot(fgl.rf)
+
+plot(fgl.rf )
+
+#### By SIZE 
+multifuncmedium= subset (multifunc, Size == "medium") ########## LARGE ONLY 
+str(multifuncmedium)
+
+fgl.rf <- randomForest(Multifunc ~ ., data = multifuncmedium, ntree=5000, mtry = 2, importance = TRUE, do.trace = 100, na.action=na.omit)
+print(fgl.rf)
+table(predict(fgl.rf))
+print(fgl.rf)
+
+importance(fgl.rf)
+varImpPlot(fgl.rf)
+
+
+
+
+######################################################  
+###############  MultifuncResultFG  ##################
+######################################################
+
+#FG
+MultifuncResultFG= read.table("MultifuncResultFGFinal.txt", header=T, sep="\t")
+MultifuncResultFG= na.omit (MultifuncResultFG)
+str(MultifuncResultFG)
+
+modelfinal1 = lme (Multifunc ~Size*treerem*mossrem*schrubrem, random = ~1|Island, data = MultifuncResultFG)
+anova(modelfinal1)
+
+par(mfrow=c(2,2))
+boxplot (meanFunc ~ Size, notch=TRUE,  data = MultifuncResultFG)
+boxplot (meanFunc ~ treerem*Size, notch=TRUE, data = MultifuncResultFG)
+boxplot (meanFunc~ mossrem*Size, notch=TRUE, data = MultifuncResultFG)
+boxplot (meanFunc ~ schrubrem*Size, notch=TRUE,  data = MultifuncResultFG)
+
+par(mfrow=c(1,1))
+boxplot (Multifunc ~ Plot, notch=TRUE,  data = MultifuncResultFG)
+
+
+#SS
+MultifuncResultSS= read.table("MultifuncResultSS.txt", header=T, sep="\t")
+MultifuncResultSS= na.omit (MultifuncResultSS)
+str(MultifuncResultSS)
+
+modelfinal8 = lme (meanFunc ~Size*myrtillusremoval*vitisremoval*empetrumremoval, random = ~1|Island, data = MultifuncResultSS)
+anova(modelfinal8)
+
+par(mfrow=c(2,2))
+boxplot (meanFunc~ Size, notch=TRUE, data = MultifuncResultSS)
+boxplot (meanFunc ~ myrtillusremoval*Size, notch=TRUE, data = MultifuncResultSS)
+boxplot (meanFunc~ vitisremoval*Size, notch=TRUE, data = MultifuncResultSS)
+boxplot (meanFunc~ empetrumremoval*Size, notch=TRUE,  data = MultifuncResultSS)
+
+par(mfrow=c(1,1))
+boxplot (meanFunc ~ Plot, notch=TRUE,  data = MultifuncResultSS)
+
+
